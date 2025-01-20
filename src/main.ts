@@ -1,81 +1,37 @@
-import ffmpeg from 'fluent-ffmpeg'
-import fs from 'node:fs'
 import path from 'node:path'
-import archiver from 'archiver'
+
+import { ProcessVideoUseCase } from './core/application/video-processing/use-cases/process-video-use-case'
+import { FrameExtractorFfmpeg } from './infra/adapter/output/frame-extractor-ffmpeg'
+import { ZipCreatorArchiver } from './infra/adapter/output/zip-creator-archiver'
 
 console.log('Processo iniciado:')
-
-const videoPath = path.resolve(process.cwd(), 'global', 'Marvel_DOTNET_CSHARP.mp4')
-const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
-const zipFilePath = path.resolve(process.cwd(), 'output', 'images.zip')
-
-// Ensure output directory exists
-if (!fs.existsSync(outputFolder)) {
-  fs.mkdirSync(outputFolder, { recursive: true })
-}
-
-// Get video duration
-const getVideoDuration = (filePath: string): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) return reject(err)
-      resolve(metadata.format.duration || 0)
-    })
-  })
-}
-
-// Generate frames
-const processFrames = async () => {
-  try {
-    const duration = await getVideoDuration(videoPath)
-    const interval = 20 // in seconds
-    const size = '1920x1080'
-
-    for (let currentTime = 0; currentTime < duration; currentTime += interval) {
-      console.log(`Processando frame: ${currentTime} segundos`)
-      const outputPath = path.join(outputFolder, `frame_at_${currentTime}.jpg`)
-
-      await new Promise<void>((resolve, reject) => {
-        ffmpeg(videoPath)
-          .on('end', () => resolve())
-          .on('error', (err: Error) => reject(err))
-          .screenshots({
-            timestamps: [currentTime],
-            filename: `frame_at_${currentTime}.jpg`,
-            folder: outputFolder,
-            size: size,
-          })
-      })
-    }
-
-    console.log('Frames processados.')
-  } catch (error) {
-    console.error('Erro ao processar frames:', error)
-  }
-}
-
-// Create ZIP file
-const createZip = () => {
-  return new Promise<void>((resolve, reject) => {
-    const output = fs.createWriteStream(zipFilePath)
-    const archive = archiver('zip', { zlib: { level: 9 } })
-
-    output.on('close', () => {
-      console.log(`ZIP criado com sucesso: ${zipFilePath}`)
-      resolve()
-    })
-
-    archive.on('error', (err) => reject(err))
-
-    archive.pipe(output)
-    archive.directory(outputFolder, false)
-    archive.finalize()
-  })
-}
-
-// Run the entire process
 ;(async () => {
-  await processFrames()
-  await createZip()
-  console.log('Processo finalizado.')
+  const videoPath = path.resolve(
+    process.cwd(),
+    'global',
+    'Marvel_DOTNET_CSHARP.mp4',
+  )
+  const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
+  const zipFilePath = path.resolve(process.cwd(), 'output', 'images.zip')
+  const interval = 20 // in seconds
+  const size = '1920x1080'
+
+  console.log(`\nVideo localizado em: ${videoPath}`)
+  console.log(`Frames serão armazenados em: ${outputFolder}`)
+  console.log(`Arquivo ZIP será salvo em: ${zipFilePath}\n`)
+
+  // Initialize dependencies
+  const frameExtractor = new FrameExtractorFfmpeg()
+  const zipCreator = new ZipCreatorArchiver()
+
+  // Use case execution
+  const useCase = new ProcessVideoUseCase(frameExtractor, zipCreator)
+
+  try {
+    console.log('Preparando diretórios...\n')
+    await useCase.execute(videoPath, outputFolder, zipFilePath, interval, size)
+    console.log('\nProcesso finalizado com sucesso.')
+  } catch (error) {
+    console.error('Erro durante o processamento:', error)
+  }
 })()
