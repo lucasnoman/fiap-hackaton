@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsx src/main.ts"
+    "start": "tsx src/main.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",

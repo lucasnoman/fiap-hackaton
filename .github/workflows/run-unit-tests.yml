@@ -1,0 +1,29 @@
+name: Run Unit Tests
+
+on: [push]
+
+jobs:
+  run-unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixa o código
+        uses: actions/checkout@v4
+
+      - name: Instala o PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+
+      - name: Instala o Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Instala dependências
+        run: pnpm install
+
+      - name: Roda os testes End To End
+        run: pnpm test
