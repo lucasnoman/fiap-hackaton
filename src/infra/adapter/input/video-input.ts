@@ -1,6 +1,6 @@
 import path from 'node:path'
+import readline from 'node:readline'
 
-import readline from 'readline'
 import { z } from 'zod'
 
 const videoPathSchema = z
