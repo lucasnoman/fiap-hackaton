@@ -10,7 +10,16 @@ const videoPathSchema = z
     message: 'Path must end with ".mp4"',
   })
 
-export const getVideoPath = async (): Promise<string> => {
+const timeSchema = z.preprocess(
+  (val) => parseInt(val as string, 10),
+  z.number().min(0),
+)
+
+export const getVideoInput = async (): Promise<{
+  videoPath: string
+  startTime: number
+  endTime: number | null // Null means "until the end of the video"
+}> => {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -19,12 +28,9 @@ export const getVideoPath = async (): Promise<string> => {
   const question = (query: string): Promise<string> =>
     new Promise((resolve) => rl.question(query, resolve))
 
-  console.log('Please provide the video file path:')
   const inputPath = await question(
     'Video file path (press Enter for default): ',
   )
-
-  rl.close()
 
   // Default to a hardcoded file if the user doesn't provide a path
   const defaultPath = path.resolve(
@@ -37,14 +43,28 @@ export const getVideoPath = async (): Promise<string> => {
     ? path.resolve(process.cwd(), inputPath)
     : defaultPath
 
-  const validation = videoPathSchema.safeParse(resolvedPath)
-
-  if (!validation.success) {
+  const pathValidation = videoPathSchema.safeParse(resolvedPath)
+  if (!pathValidation.success) {
     throw new Error(
-      `Invalid video path: ${validation.error.issues.map((i) => i.message).join(', ')}`,
+      `Invalid video path: ${pathValidation.error.issues.map((i) => i.message).join(', ')}`,
     )
   }
 
-  console.log(`Using video path: ${resolvedPath}`)
-  return resolvedPath
+  const startTimeRaw = await question(
+    'Enter start time in seconds (press Enter for default = 0): ',
+  )
+  const startTime = startTimeRaw.trim()
+    ? (timeSchema.safeParse(startTimeRaw).data ?? 0)
+    : 0
+
+  const endTimeRaw = await question(
+    'Enter end time in seconds (press Enter for default = end of video): ',
+  )
+  const endTime = endTimeRaw.trim()
+    ? (timeSchema.safeParse(endTimeRaw).data ?? 0)
+    : null
+
+  rl.close()
+
+  return { videoPath: resolvedPath, startTime, endTime }
 }

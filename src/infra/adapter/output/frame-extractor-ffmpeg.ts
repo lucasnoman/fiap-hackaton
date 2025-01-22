@@ -13,37 +13,34 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
     })
   }
 
-  extractFrames(
+  async extractFrames(
     video: Video,
     interval: number,
     outputFolder: string,
     size: string,
+    start: number = 0,
+    end: number | null = null,
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        for (
-          let currentTime = 0;
-          currentTime < video.duration;
-          currentTime += interval
-        ) {
-          console.log(`Processando frame: ${currentTime} segundos`)
+    const actualEnd = end ?? video.duration
 
-          new Promise<void>((frameResolve, frameReject) => {
-            ffmpeg(video.path)
-              .on('end', () => frameResolve())
-              .on('error', (err: Error) => frameReject(err))
-              .screenshots({
-                timestamps: [currentTime],
-                filename: `frame_at_${currentTime}.jpg`,
-                folder: outputFolder,
-                size: size,
-              })
+    for (
+      let currentTime = start;
+      currentTime < actualEnd;
+      currentTime += interval
+    ) {
+      console.log(`Processando frame: ${currentTime} segundos`)
+
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(video.path)
+          .on('end', () => resolve())
+          .on('error', (err: Error) => reject(err))
+          .screenshots({
+            timestamps: [currentTime],
+            filename: `frame_at_${currentTime}.jpg`,
+            folder: outputFolder,
+            size: size,
           })
-        }
-        resolve()
-      } catch (error) {
-        reject(error)
-      }
-    })
+      })
+    }
   }
 }

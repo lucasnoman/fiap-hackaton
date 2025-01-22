@@ -143,3 +143,9 @@ output/*
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# VSCode
+.vscode/*
+
+# Local History for Visual Studio Code
+.history/

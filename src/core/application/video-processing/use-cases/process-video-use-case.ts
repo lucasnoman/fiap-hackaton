@@ -15,14 +15,23 @@ export class ProcessVideoUseCase {
     outputFolder: string,
     zipFilePath: string,
     interval: number,
-    size: string,
+    imageSize: string,
+    startTime: number,
+    endTime: number | null,
   ): Promise<void> {
     DirectoryService.ensureDirectoryExists(outputFolder)
 
     const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
     const video = new Video(videoPath, videoDuration)
 
-    await this.frameExtractor.extractFrames(video, interval, outputFolder, size)
+    await this.frameExtractor.extractFrames(
+      video,
+      interval,
+      outputFolder,
+      imageSize,
+      startTime,
+      endTime,
+    )
 
     await this.zipCreator.createZip(outputFolder, zipFilePath)
   }

@@ -5,7 +5,9 @@ export interface FrameExtractorPort {
     video: Video,
     interval: number,
     outputFolder: string,
-    size: string,
+    imageSize: string,
+    startTimInSeconds: number,
+    endTimeInSeconds: number | null,
   ): Promise<void>
 
   getVideoDuration(filePath: string): Promise<number>
