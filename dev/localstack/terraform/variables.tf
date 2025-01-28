@@ -12,8 +12,8 @@ variable "localstack_endpoint" {
 
 variable "lambda_image_uri" {
   type        = string
-  default     = "000000000000.dkr.ecr.localhost.localstack.cloud:4566/frame-extractor-lambda:latest"
-  description = "Local ECR repo for the container image (LocalStack Pro needed)."
+  default     = "docker.io/viniciussantos45/fiap-hackaton-lambda:latest"
+  description = "The URI of the registry to use for the Lambda function."
 }
 
 variable "lambda_name" {
