@@ -1,14 +1,14 @@
 import { Video } from '@/core/domain/video-processing/entities/video'
-import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
-import { ZipCreatorPort } from '@/core/domain/video-processing/ports/zip-creator-port'
 
+import { MessageQueuePort } from '../../queue/ports/message-queue-port'
 import { DirectoryService } from '../services/directory-service'
 
 export class ProcessVideoUseCase {
   constructor(
-    private readonly frameExtractor: FrameExtractorPort,
-    private readonly zipCreator: ZipCreatorPort,
+    // private readonly frameExtractor: FrameExtractorPort,
+    // private readonly zipCreator: ZipCreatorPort,
+    private readonly queue: MessageQueuePort,
     private readonly videoRepository: VideoRepository,
   ) {}
 
@@ -20,23 +20,40 @@ export class ProcessVideoUseCase {
     imageSize: string,
     startTime: number,
     endTime: number | null,
+    queueName: string,
   ): Promise<void> {
     DirectoryService.ensureDirectoryExists(outputFolder)
 
-    const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
+    // const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
+    const videoDuration = 0
     const video = new Video(videoPath, videoDuration)
 
     await this.videoRepository.save(video)
 
-    await this.frameExtractor.extractFrames(
-      video,
-      interval,
-      outputFolder,
-      imageSize,
-      startTime,
-      endTime,
-    )
+    //TODO: refactor to use event bus
+    await this.queue.publish(queueName, {
+      event: 'VIDEO_PROCESSING',
+      timestamp: Date.now(),
+      payload: {
+        videoPath,
+        outputFolder,
+        zipFilePath,
+        interval,
+        imageSize,
+        startTime,
+        endTime,
+      },
+    })
 
-    await this.zipCreator.createZip(outputFolder, zipFilePath)
+    // await this.frameExtractor.extractFrames(
+    //   video,
+    //   interval,
+    //   outputFolder,
+    //   imageSize,
+    //   startTime,
+    //   endTime,
+    // )
+
+    // await this.zipCreator.createZip(outputFolder, zipFilePath)
   }
 }
