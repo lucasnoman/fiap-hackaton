@@ -13,14 +13,14 @@ COPY src ./src
 RUN npm run build:lambda
 
 
-RUN mv dist/entrypoints/lambda/* dist/
-RUN rm -rf entrypoints
+RUN mv ./dist/entrypoints/lambda/* ./dist/
+RUN rm -rf ./dist/entrypoints
 
 RUN ls -laR
 # Set the CMD to your handler file
 # By default the base image looks for index.handler in the /var/task/
 # So copy compiled dist to /var/task
-COPY dist/ /var/task/
+COPY ./dist/ /var/task/
 # (Optional) You can remove any dev dependencies if desired with `npm prune --production`
 
 # Command is the specific file and export in your compiled code
