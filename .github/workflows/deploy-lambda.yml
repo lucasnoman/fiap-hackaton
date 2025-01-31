@@ -7,7 +7,7 @@ on:
       - feature/sqs/localstack
     paths:
       - '.github/workflows/deploy-lambda.yml'
-      - 'docker/lambda/Docker/**'
+      - 'docker/lambda/Dockerfile'
       - 'src/**'
 
 jobs:
