@@ -18,6 +18,8 @@ RUN npm run build:lambda
 RUN mv ./dist/entrypoints/lambda/* ./dist/
 RUN rm -rf ./dist/entrypoints
 
+COPY ./dist /
+
 RUN ls -al
 
 # Redirect the output to a log file
