@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }} -f ./docker/lambda/Dockerfile .
+          docker build --no-cache -t ${{ secrets.ECR_REPOSITORY }} -f ./docker/lambda/Dockerfile .
 
       - name: Tag Docker image
         run: |
