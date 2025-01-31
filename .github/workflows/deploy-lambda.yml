@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t fiap-hackaton/lambda -f ./docker/lambda/Docker .
+          docker build -t ${{ secrets.ECR_REPOSITORY }} -f ./docker/lambda/Dockerfile .
 
       - name: Tag Docker image
         run: |
