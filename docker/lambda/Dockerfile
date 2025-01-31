@@ -12,9 +12,11 @@ COPY src ./src
 # Build the TypeScript
 RUN npm run build:lambda
 
+
 RUN mv dist/entrypoints/lambda/* dist/
 RUN rm -rf entrypoints
 
+RUN ls
 # Set the CMD to your handler file
 # By default the base image looks for index.handler in the /var/task/
 # So copy compiled dist to /var/task
