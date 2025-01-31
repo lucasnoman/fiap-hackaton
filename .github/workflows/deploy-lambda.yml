@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/sqs/localstack
     paths:
       - 'docker/lambda/Docker/**'
       - 'src/**'
