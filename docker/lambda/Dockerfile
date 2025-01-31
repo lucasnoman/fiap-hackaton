@@ -10,10 +10,7 @@ RUN npm install
 COPY src ./src
 
 # Build the TypeScript
-RUN npm run build:lambda
-
-
-RUN mv ./dist/entrypoints/lambda/* ./dist/
+RUN npm run build:lambda && mkdir -p ./dist && mv ./dist/entrypoints/lambda/* ./dist/
 # RUN rm -rf ./dist/entrypoints
 
 RUN echo ls
