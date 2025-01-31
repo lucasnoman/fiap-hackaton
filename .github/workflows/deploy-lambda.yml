@@ -6,6 +6,7 @@ on:
       - main
       - feature/sqs/localstack
     paths:
+      - '.github/workflows/deploy-lambda.yml'
       - 'docker/lambda/Docker/**'
       - 'src/**'
 
@@ -31,7 +32,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest docker/lambda/Docker
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest -f docker/lambda/Docker .
 
       - name: Tag Docker image
         run: |
