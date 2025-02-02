@@ -12,7 +12,7 @@ variable "localstack_endpoint" {
 
 variable "lambda_image_uri" {
   type        = string
-  default     = "docker.io/viniciussantos45/fiap-hackaton-lambda:latest"
+  default     = "979415506381.dkr.ecr.us-east-1.amazonaws.com/fiap-hackaton/lambda:latest"
   description = "The URI of the registry to use for the Lambda function."
 }
 
