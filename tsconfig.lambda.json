@@ -4,7 +4,7 @@
       "target": "ES2020",
       "module": "Node16",
       "outDir": "./dist",
-      "rootDir": "./src",
+      "rootDir": "./src/entrypoints/lambda",
       "strict": true,
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,

@@ -15,13 +15,10 @@ COPY src ./src
 RUN npm run build:lambda
 
 
-RUN mv ./dist/entrypoints/lambda/* ./dist/
-RUN rm -rf ./dist/entrypoints
+# RUN mv ./dist/entrypoints/lambda/* ./dist/
+# RUN rm -rf ./dist/entrypoints
 
-RUN ls -al
 
-# Redirect the output to a log file
-RUN echo "Listing files in the current directory:" && ls -al > /var/task/build.log
 # Set the CMD to your handler file
 # By default the base image looks for index.handler in the /var/task/
 # So copy compiled dist to /var/task
