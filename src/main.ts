@@ -2,15 +2,27 @@ import path from 'node:path'
 
 import { PrismaClient } from '@prisma/client'
 
+import { EventBus } from './core/application/events/event-bus'
+import { SendCutVideoErrorEmailHandler } from './core/application/video-processing/event-handlers/send-cut-video-error-email-handler'
 import { ProcessVideoUseCase } from './core/application/video-processing/use-cases/process-video-use-case'
 import { getVideoInput } from './infra/adapter/input/video-input'
+import { FakeEmailService } from './infra/adapter/output/fake-email-service'
 import { SQSAdapter } from './infra/adapter/output/sqs-adapter'
 import { VideoPrismaRepository } from './infra/adapter/output/video-prisma-repository'
 ;(async () => {
   console.log('Process started...')
 
   try {
+    const eventBus = new EventBus()
     const prisma = new PrismaClient()
+
+    const notificationEmailHandler = new SendCutVideoErrorEmailHandler(
+      new FakeEmailService(),
+    )
+    eventBus.subscribe(
+      'ProcessVideoErrorEvent',
+      notificationEmailHandler.handle,
+    )
 
     const { videoPath, startTime, endTime } = await getVideoInput()
 
