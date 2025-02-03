@@ -2,7 +2,8 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
       "target": "ES2020",
-      "module": "Node16",
+      "moduleResolution": "node",
+      "module": "CommonJS",
       "outDir": "./dist",
       "rootDir": "./src/entrypoints/lambda",
       "strict": true,
