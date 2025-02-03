@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/sqs/localstack
+      - feature/event-bus
     paths:
       - '.github/workflows/deploy-lambda.yml'
       - 'docker/lambda/Dockerfile'
