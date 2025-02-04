@@ -27,4 +27,4 @@ RUN cp -r node_modules ${LAMBDA_TASK_ROOT}
 # (Optional) You can remove any dev dependencies if desired with `npm prune --production`
 
 # Command is the specific file and export in your compiled code
-CMD ["index.handler"]
+CMD ["entrypoints/lambda/index.handler"]

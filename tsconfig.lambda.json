@@ -5,7 +5,7 @@
       "moduleResolution": "node",
       "module": "CommonJS",
       "outDir": "./dist",
-      "rootDir": "./src/entrypoints/lambda",
+      "rootDir": "./src",
       "strict": true,
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
