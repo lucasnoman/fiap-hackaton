@@ -2,6 +2,8 @@ import { SQSHandler } from 'aws-lambda'
 import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
 
+import { Message } from '@/core/application/queue/value-objects/message-value-object'
+
 type MessageBody = {
   videoPath: string
   outputFolder: string
@@ -23,12 +25,14 @@ if (ffmpegPath) {
 export const handler: SQSHandler = async (event) => {
   for (const record of event.Records) {
     try {
-      const messageBody = JSON.parse(record.body) as MessageBody
+      const messageBody = JSON.parse(record.body) as Message<MessageBody>
 
-      const videoPath = messageBody.videoPath
-      const outputFolder = messageBody.outputFolder
-      const startTime = messageBody.startTime
-      const endTime = messageBody.endTime
+      const { payload } = messageBody
+
+      const videoPath = payload.videoPath
+      const outputFolder = payload.outputFolder
+      const startTime = payload.startTime
+      const endTime = payload.endTime
 
       console.log(`Processing video: ${videoPath}`)
       console.log(`Output folder: ${outputFolder}`)
