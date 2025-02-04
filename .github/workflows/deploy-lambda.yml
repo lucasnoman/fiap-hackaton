@@ -44,3 +44,7 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push ${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Update Lambda function with new image
+        run: |
+          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --image-uri ${{ secrets.ECR_REPOSITORY }}:latest
