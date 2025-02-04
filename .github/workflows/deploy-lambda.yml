@@ -8,6 +8,8 @@ on:
       - feature/event-bus
     paths:
       - '.github/workflows/deploy-lambda.yml'
+      - tsconfig.lambda.json
+      - tsconfig.json
       - 'docker/lambda/Dockerfile'
       - 'src/**'
 
