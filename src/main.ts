@@ -6,6 +6,7 @@ import { EventBus } from './core/application/events/event-bus'
 import { ProcessedVideoEventHandler } from './core/application/video-processing/event-handlers/processed-video-handler'
 import { SendCutVideoErrorEmailHandler } from './core/application/video-processing/event-handlers/send-cut-video-error-email-handler'
 import { ProcessVideoUseCase } from './core/application/video-processing/use-cases/process-video-use-case'
+import { VideoProcessingEvents } from './core/domain/video-processing/value-objects/events-enum'
 import { getVideoInput } from './infra/adapter/input/video-input'
 import { FakeEmailService } from './infra/adapter/output/fake-email-service'
 import { SQSAdapter } from './infra/adapter/output/sqs-adapter'
@@ -70,7 +71,14 @@ import { VideoPrismaRepository } from './infra/adapter/output/video-prisma-repos
       await sqsQueue.subscribe(
         'https://sqs.us-east-1.amazonaws.com/979415506381/frame-extractor-queue-completion',
         async (message) => {
-          console.log('Message received:', message)
+          switch (message.event) {
+            case VideoProcessingEvents.PROCESSED_VIDEO:
+              console.log('Frame extraction completed')
+              break
+            default:
+              console.error('Unknown event:', message.event)
+              break
+          }
         },
       )
     }

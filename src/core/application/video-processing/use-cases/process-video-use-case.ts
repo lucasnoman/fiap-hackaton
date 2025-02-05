@@ -1,5 +1,6 @@
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
+import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
 
 import { MessageQueuePort } from '../../queue/ports/message-queue-port'
@@ -34,7 +35,7 @@ export class ProcessVideoUseCase {
 
     //TODO: refactor to use event bus
     await this.queue.publish(queueName, {
-      event: 'VIDEO_PROCESSING',
+      event: VideoProcessingEvents.EXTRACT_FRAMES,
       timestamp: Date.now(),
       payload: {
         videoPath,

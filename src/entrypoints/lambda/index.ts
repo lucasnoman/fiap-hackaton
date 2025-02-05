@@ -4,6 +4,7 @@ import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
 
 import { Message } from '@/core/application/queue/value-objects/message-value-object'
+import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
 
 type MessageBody = {
   videoPath: string
@@ -99,7 +100,7 @@ export const handler: SQSHandler = async (event) => {
         new SendMessageCommand({
           QueueUrl: outputQueueUrl,
           MessageBody: JSON.stringify({
-            event: 'FRAME_EXTRACTION_COMPLETED',
+            event: VideoProcessingEvents.PROCESSED_VIDEO,
             timestamp: Date.now(),
             payload: {
               status: 'COMPLETED',
