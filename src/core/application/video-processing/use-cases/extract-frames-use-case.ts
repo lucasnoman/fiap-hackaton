@@ -25,7 +25,7 @@ export class ExtractFramesUseCase {
 
     const videoFile = await this.storage.retrieve(videoPath)
 
-    const localVideoPath = `/tmp/${videoPath.split('/').pop()}`
+    const localVideoPath = `/tmp/${videoPath}`
 
     await fs.writeFile(localVideoPath, videoFile)
 
