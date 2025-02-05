@@ -1,3 +1,4 @@
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import { SQSHandler } from 'aws-lambda'
 import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
@@ -16,7 +17,7 @@ type MessageBody = {
 // const pipeline = promisify(stream.pipeline)
 
 // const s3Client = new S3Client({})
-// const sqsClient = new SQSClient({})
+const sqsClient = new SQSClient({})
 
 if (ffmpegPath) {
   ffmpeg.setFfmpegPath(ffmpegPath)
@@ -89,22 +90,28 @@ export const handler: SQSHandler = async (event) => {
       //   console.log(`Uploaded frame: s3://${outputBucket}/${s3Key}`)
       // }
 
-      // // 4) (Optional) Send an SQS message indicating completion
+      // 4) (Optional) Send an SQS message indicating completion
       // const outputQueueUrl = process.env.OUTPUT_QUEUE_URL
+      const outputQueueUrl =
+        'https://sqs.us-east-1.amazonaws.com/979415506381/frame-extractor-queue-completion'
       // if (outputQueueUrl) {
-      //   await sqsClient.send(
-      //     new SendMessageCommand({
-      //       QueueUrl: outputQueueUrl,
-      //       MessageBody: JSON.stringify({
-      //         status: 'COMPLETED',
-      //         framesCount: frameFiles.length,
-      //         inputVideo: `s3://${inputBucket}/${inputKey}`,
-      //         outputFramesPrefix: `s3://${outputBucket}/${outputPrefix}/`,
-      //       }),
-      //     }),
-      //   )
+      await sqsClient.send(
+        new SendMessageCommand({
+          QueueUrl: outputQueueUrl,
+          MessageBody: JSON.stringify({
+            event: 'FRAME_EXTRACTION_COMPLETED',
+            timestamp: Date.now(),
+            payload: {
+              status: 'COMPLETED',
+              // framesCount: frameFiles.length,
+              // inputVideo: `s3://${inputBucket}/${inputKey}`,
+              // outputFramesPrefix: `s3://${outputBucket}/${outputPrefix}/`,
+            },
+          } as Message),
+        }),
+      )
 
-      //   console.log(`Completion message sent to: ${outputQueueUrl}`)
+      console.log(`Completion message sent to: ${outputQueueUrl}`)
       // }
 
       console.log('Frame extraction and uploads completed.')

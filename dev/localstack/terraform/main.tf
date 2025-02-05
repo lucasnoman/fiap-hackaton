@@ -68,6 +68,20 @@ resource "aws_sqs_queue" "queue" {
   message_retention_seconds  = 86400
 }
 
+resource "aws_sqs_queue" "completion_queue" {
+  name = "${var.sqs_name}-completion"
+
+  visibility_timeout_seconds = 30
+  message_retention_seconds  = 86400
+}
+resource "aws_lambda_permission" "allow_sqs_send_message" {
+  statement_id  = "AllowSQSSendMessage"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_docker.function_name
+  principal     = "sqs.amazonaws.com"
+  source_arn    = aws_sqs_queue.completion_queue.arn
+}
+
 # data "aws_iam_policy_document" "lambda_assume_role" {
 #   statement {
 #     actions = ["sts:AssumeRole"]
@@ -131,7 +145,7 @@ resource "aws_lambda_function" "lambda_docker" {
   # For container-based Lambdas, you might need the Pro version of LocalStack.
   # The following is optional if your Docker image's entrypoint is set.
   image_config {
-    command     = ["python3", "app.py"]
+    command     = []
     entry_point = []
   }
 }

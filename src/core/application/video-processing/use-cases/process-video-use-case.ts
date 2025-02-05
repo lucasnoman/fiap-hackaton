@@ -1,5 +1,6 @@
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
+import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
 
 import { MessageQueuePort } from '../../queue/ports/message-queue-port'
 import { DirectoryService } from '../services/directory-service'
@@ -26,7 +27,8 @@ export class ProcessVideoUseCase {
 
     // const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
     const videoDuration = 0
-    const video = new Video(videoPath, videoDuration)
+    const info = new VideoInformation(videoPath, videoDuration)
+    const video = new Video(info)
 
     await this.videoRepository.save(video)
 

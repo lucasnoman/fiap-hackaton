@@ -1,5 +1,6 @@
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
+import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
 
 import { DirectoryService } from '../services/directory-service'
 
@@ -18,7 +19,9 @@ export class ExtractFramesUseCase {
 
     const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
 
-    const video = new Video(videoPath, videoDuration)
+    const info = VideoInformation.create(videoPath, videoDuration)
+
+    const video = new Video(info)
 
     await this.frameExtractor.extractFrames(
       video,
