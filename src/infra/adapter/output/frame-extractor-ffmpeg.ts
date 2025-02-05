@@ -21,7 +21,7 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
     start: number = 0,
     end: number | null = null,
   ): Promise<void> {
-    const actualEnd = end ?? video.duration
+    const actualEnd = end ?? video.info.duration
 
     for (
       let currentTime = start;
@@ -31,7 +31,7 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
       console.log(`Processando frame: ${currentTime} segundos`)
 
       await new Promise<void>((resolve, reject) => {
-        ffmpeg(video.path)
+        ffmpeg(video.info.path)
           .on('end', () => resolve())
           .on('error', (err: Error) => reject(err))
           .screenshots({

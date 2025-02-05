@@ -9,6 +9,7 @@ import { ProcessVideoUseCase } from './core/application/video-processing/use-cas
 import { VideoProcessingEvents } from './core/domain/video-processing/value-objects/events-enum'
 import { getVideoInput } from './infra/adapter/input/video-input'
 import { FakeEmailService } from './infra/adapter/output/fake-email-service'
+import { S3Adapter } from './infra/adapter/output/s3-adapter'
 import { SQSAdapter } from './infra/adapter/output/sqs-adapter'
 import { VideoPrismaRepository } from './infra/adapter/output/video-prisma-repository'
 ;(async () => {
@@ -46,10 +47,13 @@ import { VideoPrismaRepository } from './infra/adapter/output/video-prisma-repos
       'https://sqs.us-east-1.amazonaws.com/979415506381/frame-extractor-queue'
     const sqsQueue = new SQSAdapter(process.env.AWS_REGION || 'us-east-1')
 
+    const s3Storage = new S3Adapter('frame-extractor-bucket-210932-nmvzbm91')
+
     const useCase = new ProcessVideoUseCase(
       //   frameExtractor,
       //   zipCreator,
       sqsQueue,
+      s3Storage,
       videoRepository,
     )
     await useCase.execute(

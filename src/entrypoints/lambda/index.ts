@@ -4,7 +4,10 @@ import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
 
 import { Message } from '@/core/application/queue/value-objects/message-value-object'
+import { ExtractFramesUseCase } from '@/core/application/video-processing/use-cases/extract-frames-use-case'
 import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
+import { FrameExtractorFfmpeg } from '@/infra/adapter/output/frame-extractor-ffmpeg'
+import { S3Adapter } from '@/infra/adapter/output/s3-adapter'
 
 type MessageBody = {
   videoPath: string
@@ -46,16 +49,17 @@ export const handler: SQSHandler = async (event) => {
       // const outputBucket = messageBody.outputBucket
       // const outputPrefix = messageBody.outputPrefix || 'frames'
 
-      // const frameExtractor = new FrameExtractorFfmpeg()
-      // const useCase = new ExtractFramesUseCase(frameExtractor)
-      // await useCase.execute(
-      //   videoPath,
-      //   outputFolder,
-      //   20,
-      //   '1920x1080',
-      //   startTime,
-      //   endTime,
-      // )
+      const frameExtractor = new FrameExtractorFfmpeg()
+      const s3Storage = new S3Adapter('frame-extractor-bucket-210932-nmvzbm91')
+      const useCase = new ExtractFramesUseCase(frameExtractor, s3Storage)
+      await useCase.execute(
+        videoPath,
+        outputFolder,
+        20,
+        '1920x1080',
+        startTime,
+        endTime,
+      )
 
       // console.log(`Processing video s3://${inputBucket}/${inputKey}`)
 
