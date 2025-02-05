@@ -1,9 +1,15 @@
+import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 
 export class FrameExtractorFfmpeg implements FrameExtractorPort {
+  constructor() {
+    if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath)
+    else throw new Error('FFmpeg not found')
+  }
+
   getVideoDuration(videoPath: string): Promise<number> {
     return new Promise((resolve, reject) => {
       ffmpeg.ffprobe(videoPath, (err, metadata) => {
