@@ -3,7 +3,7 @@ import readline from 'node:readline'
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getVideoInput } from '@/infra/adapter/input/video-input'
+import { getVideoInput } from '@/infra/adapter/input/cli/video-input'
 
 vi.mock('readline')
 vi.mock('node:path')

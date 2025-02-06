@@ -3,10 +3,10 @@ import path from 'node:path'
 import { PrismaClient } from '@prisma/client'
 
 import { ProcessVideoUseCase } from './core/application/video-processing/use-cases/process-video-use-case'
-import { getVideoInput } from './infra/adapter/input/video-input'
-import { FrameExtractorFfmpeg } from './infra/adapter/output/frame-extractor-ffmpeg'
-import { VideoPrismaRepository } from './infra/adapter/output/video-prisma-repository'
-import { ZipCreatorArchiver } from './infra/adapter/output/zip-creator-archiver'
+import { getVideoInput } from './infra/adapter/input/cli/video-input'
+import { FrameExtractorFfmpeg } from './infra/adapter/output/external-services/frame-extractor-ffmpeg'
+import { VideoPrismaRepository } from './infra/adapter/output/persistence/video-prisma-repository'
+import { ZipCreatorArchiver } from './infra/adapter/output/persistence/zip-creator-archiver'
 ;(async () => {
   console.log('Process started...')
 
