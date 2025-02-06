@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:13
     environment:
-      POSTGRES_USER: fiap-hackaton
-      POSTGRES_PASSWORD: our-strong-password-1205132
-      POSTGRES_DB: fiap-hackaton
+      POSTGRES_USER: ${CONTAINER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${CONTAINER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${CONTAINER_POSTGRES_DB}
     ports:
       - '5432:5432'
     volumes:
