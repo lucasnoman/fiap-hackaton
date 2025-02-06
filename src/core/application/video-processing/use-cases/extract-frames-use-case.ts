@@ -1,5 +1,7 @@
 import { promises as fs } from 'node:fs'
 
+import { join } from 'path'
+
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
@@ -46,7 +48,15 @@ export class ExtractFramesUseCase {
       endTime,
     )
 
-    await this.storage.store(outputFolder, await fs.readFile(outputFolder))
+    const frames = await fs.readdir(outputFolder)
+
+    await Promise.all([
+      frames.map(async (frame) => {
+        const framePath = join(outputFolder, frame)
+        const frameContent = await fs.readFile(framePath)
+        await this.storage.store(framePath, frameContent)
+      }),
+    ])
 
     // await this.zipCreator.createZip(outputFolder, zipFilePath)
   }
