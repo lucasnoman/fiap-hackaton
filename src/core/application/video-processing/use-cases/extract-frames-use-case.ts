@@ -48,6 +48,7 @@ export class ExtractFramesUseCase {
       endTime,
     )
 
+    console.log('Output folder', outputFolder)
     const frames = await fs.readdir(outputFolder)
 
     await Promise.all([
