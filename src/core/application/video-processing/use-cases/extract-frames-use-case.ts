@@ -46,6 +46,8 @@ export class ExtractFramesUseCase {
       endTime,
     )
 
+    await this.storage.store(outputFolder, await fs.readFile(outputFolder))
+
     // await this.zipCreator.createZip(outputFolder, zipFilePath)
   }
 }
