@@ -21,11 +21,13 @@ export class ExtractFramesUseCase {
     startTime: number,
     endTime: number | null,
   ): Promise<void> {
-    DirectoryService.ensureDirectoryExists(outputFolder)
-
     const videoFile = await this.storage.retrieve(videoPath)
 
     const localVideoPath = `/tmp/${videoPath}`
+
+    const outputFolderPath = `/tmp/frames/${videoPath.split('.')[0]}`
+
+    DirectoryService.ensureDirectoryExists(outputFolder)
 
     await fs.writeFile(localVideoPath, videoFile)
 
@@ -39,7 +41,7 @@ export class ExtractFramesUseCase {
     await this.frameExtractor.extractFrames(
       video,
       interval,
-      outputFolder,
+      outputFolderPath,
       imageSize,
       startTime,
       endTime,
