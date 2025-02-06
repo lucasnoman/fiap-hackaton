@@ -55,7 +55,7 @@ export class ExtractFramesUseCase {
       frames.map(async (frame) => {
         const framePath = join(outputFolder, frame)
         const frameContent = await fs.readFile(framePath)
-        await this.storage.store(framePath, frameContent)
+        await this.storage.store(framePath.replace('/tmp', ''), frameContent)
       }),
     ])
 
