@@ -44,7 +44,7 @@ export class ProcessVideoUseCase {
 
     await this.videoRepository.save(video)
 
-    const outputFolderPath = `/tmp/frames/${videoPath.split('.')[0]}`
+    const outputFolderPath = `/tmp/frames/${filename.split('.')[0]}`
 
     //TODO: refactor to use event bus
     await this.queue.publish(queueName, {

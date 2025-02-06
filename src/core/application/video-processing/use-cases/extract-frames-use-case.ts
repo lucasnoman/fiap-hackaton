@@ -33,7 +33,7 @@ export class ExtractFramesUseCase {
     const videoDuration =
       await this.frameExtractor.getVideoDuration(localVideoPath)
 
-    const info = VideoInformation.create(videoPath, videoDuration)
+    const info = VideoInformation.create(localVideoPath, videoDuration)
 
     const video = new Video(info)
 
