@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import archiver from 'archiver'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ZipCreatorArchiver } from '@/infra/adapter/output/zip-creator-archiver'
+import { ZipCreatorArchiver } from '@/infra/adapter/output/persistence/zip-creator-archiver'
 
 vi.mock('node:fs')
 vi.mock('archiver')

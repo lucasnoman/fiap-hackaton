@@ -2,6 +2,7 @@ import ffmpeg from 'fluent-ffmpeg'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
+import { uniqueName } from '@/shared/utils/unique-name-creator'
 
 export class FrameExtractorFfmpeg implements FrameExtractorPort {
   getVideoDuration(videoPath: string): Promise<number> {
@@ -36,7 +37,7 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
           .on('error', (err: Error) => reject(err))
           .screenshots({
             timestamps: [currentTime],
-            filename: `frame_at_${currentTime}.jpg`,
+            filename: `${uniqueName}__frame_at_${currentTime}.jpg`,
             folder: outputFolder,
             size: size,
           })

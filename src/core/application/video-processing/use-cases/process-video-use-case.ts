@@ -1,9 +1,20 @@
+import path from 'node:path'
+
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { ZipCreatorPort } from '@/core/domain/video-processing/ports/zip-creator-port'
+import { uniqueName } from '@/shared/utils/unique-name-creator'
 
 import { DirectoryService } from '../services/directory-service'
+
+type processVideoMethod = {
+  videoPath: string
+  intervalInSecondsToExtractFrames: number
+  imageSize: string
+  secondsStartExtractingFrames: number
+  secondsEndExtractingFrames: number | null
+}
 
 export class ProcessVideoUseCase {
   constructor(
@@ -12,15 +23,20 @@ export class ProcessVideoUseCase {
     private readonly videoRepository: VideoRepository,
   ) {}
 
-  async execute(
-    videoPath: string,
-    outputFolder: string,
-    zipFilePath: string,
-    interval: number,
-    imageSize: string,
-    startTime: number,
-    endTime: number | null,
-  ): Promise<void> {
+  async execute({
+    videoPath,
+    intervalInSecondsToExtractFrames,
+    imageSize,
+    secondsStartExtractingFrames,
+    secondsEndExtractingFrames,
+  }: processVideoMethod): Promise<void> {
+    const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
+    const zipFilePath = path.resolve(
+      process.cwd(),
+      'output',
+      `${uniqueName}.zip`,
+    )
+
     DirectoryService.ensureDirectoryExists(outputFolder)
 
     const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
@@ -30,11 +46,11 @@ export class ProcessVideoUseCase {
 
     await this.frameExtractor.extractFrames(
       video,
-      interval,
+      intervalInSecondsToExtractFrames,
       outputFolder,
       imageSize,
-      startTime,
-      endTime,
+      secondsStartExtractingFrames,
+      secondsEndExtractingFrames,
     )
 
     await this.zipCreator.createZip(outputFolder, zipFilePath)
