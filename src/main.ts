@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import { PrismaClient } from '@prisma/client'
 
 import { ProcessVideoUseCase } from './core/application/video-processing/use-cases/process-video-use-case'
@@ -15,9 +13,6 @@ import { ZipCreatorArchiver } from './infra/adapter/output/persistence/zip-creat
 
     const { videoPath, startTime, endTime } = await getVideoInput()
 
-    const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
-    const zipFilePath = path.resolve(process.cwd(), 'output', 'images.zip')
-
     const frameExtractor = new FrameExtractorFfmpeg()
     const zipCreator = new ZipCreatorArchiver()
     const videoRepository = new VideoPrismaRepository(prisma)
@@ -27,15 +22,14 @@ import { ZipCreatorArchiver } from './infra/adapter/output/persistence/zip-creat
       zipCreator,
       videoRepository,
     )
-    await useCase.execute(
-      videoPath,
-      outputFolder,
-      zipFilePath,
-      20,
-      '1920x1080',
-      startTime,
-      endTime,
-    )
+
+    await useCase.execute({
+      videoPath: videoPath,
+      intervalInSecondsToExtractFrames: 20,
+      imageSize: '1920x1080',
+      secondsStartExtractingFrames: startTime,
+      secondsEndExtractingFrames: endTime,
+    })
 
     console.log('Process completed successfully.')
   } catch (error) {
