@@ -7,7 +7,6 @@ import { VideoInformation } from '@/core/domain/video-processing/value-objects/v
 
 import { MessageQueuePort } from '../../queue/ports/message-queue-port'
 import { StoragePort } from '../../storage/ports/storage-port'
-import { DirectoryService } from '../services/directory-service'
 
 export class ProcessVideoUseCase {
   constructor(
@@ -28,8 +27,6 @@ export class ProcessVideoUseCase {
     endTime: number | null,
     queueName: string,
   ): Promise<void> {
-    DirectoryService.ensureDirectoryExists(outputFolder)
-
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${videoPath
       .split('.')
       .pop()}`
@@ -47,13 +44,15 @@ export class ProcessVideoUseCase {
 
     await this.videoRepository.save(video)
 
+    const outputFolderPath = `/tmp/frames/${videoPath.split('.')[0]}`
+
     //TODO: refactor to use event bus
     await this.queue.publish(queueName, {
       event: VideoProcessingEvents.EXTRACT_FRAMES,
       timestamp: Date.now(),
       payload: {
         videoPath: storagePath,
-        outputFolder,
+        outputFolder: outputFolderPath,
         zipFilePath,
         interval,
         imageSize,
