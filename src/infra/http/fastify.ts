@@ -11,6 +11,7 @@ import {
 import { ZodError } from 'zod'
 
 import { env } from '../config/env'
+import { setupRoutes } from './setup-routes'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -35,6 +36,8 @@ app.register(import('@scalar/fastify-api-reference'), {
   routePrefix: '/docs',
   configuration: { theme: 'elysiajs' },
 })
+
+app.register(setupRoutes)
 
 app.setErrorHandler((error, _request, reply) => {
   if (error instanceof ZodError) {
