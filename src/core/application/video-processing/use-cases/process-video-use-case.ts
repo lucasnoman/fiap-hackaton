@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs'
 
+
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
@@ -7,6 +8,14 @@ import { VideoInformation } from '@/core/domain/video-processing/value-objects/v
 
 import { MessageQueuePort } from '../../queue/ports/message-queue-port'
 import { StoragePort } from '../../storage/ports/storage-port'
+
+type processVideoMethod = {
+  videoPath: string
+  intervalInSecondsToExtractFrames: number
+  imageSize: string
+  secondsStartExtractingFrames: number
+  secondsEndExtractingFrames: number | null
+}
 
 export class ProcessVideoUseCase {
   constructor(

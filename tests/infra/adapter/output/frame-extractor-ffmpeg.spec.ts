@@ -2,7 +2,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
-import { FrameExtractorFfmpeg } from '@/infra/adapter/output/frame-extractor-ffmpeg'
+import { FrameExtractorFfmpeg } from '@/infra/adapter/output/external-services/frame-extractor-ffmpeg'
 
 vi.mock('fluent-ffmpeg')
 

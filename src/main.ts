@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import { PrismaClient } from '@prisma/client'
 
 import { EventBus } from './core/application/events/event-bus'
@@ -12,7 +10,7 @@ import { FakeEmailService } from './infra/adapter/output/fake-email-service'
 import { S3Adapter } from './infra/adapter/output/s3-adapter'
 import { SQSAdapter } from './infra/adapter/output/sqs-adapter'
 import { VideoPrismaRepository } from './infra/adapter/output/video-prisma-repository'
-;(async () => {
+(async () => {
   console.log('Process started...')
 
   try {
