@@ -1,3 +1,5 @@
+import ffmpegPath from 'ffmpeg-static'
+import ffprobe from 'ffprobe-static'
 import ffmpeg from 'fluent-ffmpeg'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
@@ -5,6 +7,14 @@ import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-e
 import { uniqueName } from '@/shared/utils/unique-name-creator'
 
 export class FrameExtractorFfmpeg implements FrameExtractorPort {
+  constructor() {
+    if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath)
+    else throw new Error('FFmpeg not found')
+
+    if (ffprobe.path) ffmpeg.setFfprobePath(ffprobe.path)
+    else throw new Error('FFprobe not found')
+  }
+
   getVideoDuration(videoPath: string): Promise<number> {
     return new Promise((resolve, reject) => {
       ffmpeg.ffprobe(videoPath, (err, metadata) => {
@@ -22,7 +32,7 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
     start: number = 0,
     end: number | null = null,
   ): Promise<void> {
-    const actualEnd = end ?? video.duration
+    const actualEnd = end ?? video.info.duration
 
     for (
       let currentTime = start;
@@ -32,7 +42,7 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
       console.log(`Processando frame: ${currentTime} segundos`)
 
       await new Promise<void>((resolve, reject) => {
-        ffmpeg(video.path)
+        ffmpeg(video.info.path)
           .on('end', () => resolve())
           .on('error', (err: Error) => reject(err))
           .screenshots({

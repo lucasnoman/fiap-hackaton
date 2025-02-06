@@ -2,6 +2,7 @@ import { PrismaClient, Video as PrismaVideo } from '@prisma/client'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
+import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
 
 type PrismaVideoData = Omit<PrismaVideo, 'id' | 'createdAt' | 'updatedAt'>
 
@@ -9,13 +10,15 @@ export class VideoPrismaRepository implements VideoRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   mapToDomain(data: PrismaVideo): Video {
-    return new Video(data.filename, data.duration)
+    const info = VideoInformation.create(data.filename, data.duration)
+
+    return new Video(info)
   }
 
   mapToRepository(video: Video): PrismaVideoData {
     return {
-      duration: video.duration,
-      filename: video.path,
+      duration: video.info.duration,
+      filename: video.info.path,
     }
   }
 
@@ -28,7 +31,7 @@ export class VideoPrismaRepository implements VideoRepository {
     const data = this.mapToRepository(video)
 
     const videoData = await this.prisma.video.findFirst({
-      where: { filename: video.path },
+      where: { filename: video.info.path },
     })
 
     if (!videoData) throw new Error('Video not found')

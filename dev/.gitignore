@@ -1,0 +1,15 @@
+*.tfstate
+*.tfstate.backup
+*.lock.hcl
+
+
+*.exe
+terraform/.terraform/providers/**/LICENSE.txt
+
+
+*.pem
+*.crt
+*.key
+
+
+volume/cache/*
