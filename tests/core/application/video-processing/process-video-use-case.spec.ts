@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DirectoryService } from '@/core/application/video-processing/services/directory-service'
@@ -5,11 +7,22 @@ import { ProcessVideoUseCase } from '@/core/application/video-processing/use-cas
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 import { ZipCreatorPort } from '@/core/domain/video-processing/ports/zip-creator-port'
+import { VideoInMemoryRepository } from '@/infra/adapter/output/repositories/in-memory/video-in-memory-repository'
+import { uniqueName } from '@/shared/utils/unique-name-creator'
 
 describe('ProcessVideoUseCase', () => {
   let frameExtractor: FrameExtractorPort
   let zipCreator: ZipCreatorPort
   let processVideoUseCase: ProcessVideoUseCase
+
+  const OUTPUTFOLDER = path.resolve(process.cwd(), 'output', 'Images')
+  const ZIPFILEPATH = path.resolve(process.cwd(), 'output', `${uniqueName}.zip`)
+  const VIDEOPATH = 'test-video.mp4'
+  const INTERVALINSECONDSTOEXTRACTFRAMES = 1
+  const IMAGESIZE = '1280x720'
+  const SECONDSSTARTEXTRACTINGFRAMES = 0
+  const SECONDSENDEXTRACTINGFRAMES = 10
+  const MOCKDURATION = 60
 
   beforeEach(() => {
     frameExtractor = {
@@ -21,83 +34,67 @@ describe('ProcessVideoUseCase', () => {
       createZip: vi.fn(),
     }
 
-    processVideoUseCase = new ProcessVideoUseCase(frameExtractor, zipCreator)
+    const videoRepository = new VideoInMemoryRepository()
+
+    processVideoUseCase = new ProcessVideoUseCase(
+      frameExtractor,
+      zipCreator,
+      videoRepository,
+    )
     vi.spyOn(DirectoryService, 'ensureDirectoryExists').mockImplementation(
       () => {},
     )
   })
 
   it('should successfully process a video and create a zip file', async () => {
-    const videoPath = 'test-video.mp4'
-    const outputFolder = 'output/test'
-    const zipFilePath = 'output/test.zip'
-    const interval = 1
-    const imageSize = '1280x720'
-    const startTime = 0
-    const endTime = 10
-    const mockDuration = 60
+    vi.mocked(frameExtractor.getVideoDuration).mockResolvedValue(MOCKDURATION)
 
-    vi.mocked(frameExtractor.getVideoDuration).mockResolvedValue(mockDuration)
-
-    await processVideoUseCase.execute(
-      videoPath,
-      outputFolder,
-      zipFilePath,
-      interval,
-      imageSize,
-      startTime,
-      endTime,
-    )
+    await processVideoUseCase.execute({
+      videoPath: VIDEOPATH,
+      intervalInSecondsToExtractFrames: INTERVALINSECONDSTOEXTRACTFRAMES,
+      imageSize: IMAGESIZE,
+      secondsStartExtractingFrames: SECONDSSTARTEXTRACTINGFRAMES,
+      secondsEndExtractingFrames: SECONDSENDEXTRACTINGFRAMES,
+    })
 
     expect(DirectoryService.ensureDirectoryExists).toHaveBeenCalledWith(
-      outputFolder,
+      OUTPUTFOLDER,
     )
-    expect(frameExtractor.getVideoDuration).toHaveBeenCalledWith(videoPath)
+    expect(frameExtractor.getVideoDuration).toHaveBeenCalledWith(VIDEOPATH)
     expect(frameExtractor.extractFrames).toHaveBeenCalledWith(
       expect.any(Video),
-      interval,
-      outputFolder,
-      imageSize,
-      startTime,
-      endTime,
+      INTERVALINSECONDSTOEXTRACTFRAMES,
+      OUTPUTFOLDER,
+      IMAGESIZE,
+      SECONDSSTARTEXTRACTINGFRAMES,
+      SECONDSENDEXTRACTINGFRAMES,
     )
-    expect(zipCreator.createZip).toHaveBeenCalledWith(outputFolder, zipFilePath)
+    expect(zipCreator.createZip).toHaveBeenCalledWith(OUTPUTFOLDER, ZIPFILEPATH)
   })
 
   it('should handle video processing with null endTime', async () => {
-    const videoPath = 'test-video.mp4'
-    const outputFolder = 'output/test'
-    const zipFilePath = 'output/test.zip'
-    const interval = 1
-    const imageSize = '1280x720'
-    const startTime = 0
-    const endTime = null
-    const mockDuration = 30
+    vi.mocked(frameExtractor.getVideoDuration).mockResolvedValue(MOCKDURATION)
 
-    vi.mocked(frameExtractor.getVideoDuration).mockResolvedValue(mockDuration)
-
-    await processVideoUseCase.execute(
-      videoPath,
-      outputFolder,
-      zipFilePath,
-      interval,
-      imageSize,
-      startTime,
-      endTime,
-    )
+    await processVideoUseCase.execute({
+      videoPath: VIDEOPATH,
+      intervalInSecondsToExtractFrames: INTERVALINSECONDSTOEXTRACTFRAMES,
+      imageSize: IMAGESIZE,
+      secondsStartExtractingFrames: SECONDSSTARTEXTRACTINGFRAMES,
+      secondsEndExtractingFrames: SECONDSENDEXTRACTINGFRAMES,
+    })
 
     expect(DirectoryService.ensureDirectoryExists).toHaveBeenCalledWith(
-      outputFolder,
+      OUTPUTFOLDER,
     )
-    expect(frameExtractor.getVideoDuration).toHaveBeenCalledWith(videoPath)
+    expect(frameExtractor.getVideoDuration).toHaveBeenCalledWith(VIDEOPATH)
     expect(frameExtractor.extractFrames).toHaveBeenCalledWith(
       expect.any(Video),
-      interval,
-      outputFolder,
-      imageSize,
-      startTime,
-      endTime,
+      INTERVALINSECONDSTOEXTRACTFRAMES,
+      OUTPUTFOLDER,
+      IMAGESIZE,
+      SECONDSSTARTEXTRACTINGFRAMES,
+      SECONDSENDEXTRACTINGFRAMES,
     )
-    expect(zipCreator.createZip).toHaveBeenCalledWith(outputFolder, zipFilePath)
+    expect(zipCreator.createZip).toHaveBeenCalledWith(OUTPUTFOLDER, ZIPFILEPATH)
   })
 })
