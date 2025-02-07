@@ -36,7 +36,7 @@ export const handler: SQSHandler = async (event) => {
       const imageSize = payload.imageSize
       const videoPath = payload.storagePath
       const outputFolder = path.resolve(
-        process.cwd(),
+        '/tmp',
         'output',
         'frames',
         payload.filename.split('.')[0],
