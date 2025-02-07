@@ -39,7 +39,7 @@ export const handler: SQSHandler = async (event) => {
         process.cwd(),
         'output',
         'frames',
-        payload.filename,
+        payload.filename.split('.')[0],
       )
 
       console.log(`Processing video: ${videoPath}`)
