@@ -139,8 +139,8 @@ resource "aws_lambda_function" "lambda_docker" {
 
   # In real AWS, you can set memory, timeout, environment, etc.
   # LocalStack does not enforce all these the same way, but it's good to keep them:
-  memory_size = 128
-  timeout     = 30
+  memory_size = 1024
+  timeout     = 60
 
   # For container-based Lambdas, you might need the Pro version of LocalStack.
   # The following is optional if your Docker image's entrypoint is set.
