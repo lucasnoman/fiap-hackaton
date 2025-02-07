@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 
 import { makeVideoPocessing } from '@/infra/adapter/factories/make-video-processing'
 import { makeVideoUpload } from '@/infra/adapter/factories/make-video-upload'
+import { sendMail } from '@/infra/adapter/output/external-services/email'
 
 import { VideoUploadError, VideoUploadResponse } from '../dtos/send-video-dto'
 
@@ -50,6 +51,13 @@ export async function extractVideoFrames(
       details:
         error instanceof Error ? error.message : 'Unknown error occurred',
     }
+
+    sendMail({
+      from: 'onboarding@resend.dev',
+      to: 'lucas.noman7@gmail.com',
+      subject: 'Failed to process the video',
+      html: `<h2>The video failed to be processed.</h2> <p><strong>Error</strong>: ${errorResponse.details}</p>`,
+    })
 
     return reply.status(500).send(errorResponse)
   }
