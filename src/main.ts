@@ -24,7 +24,7 @@ import { VideoPrismaRepository } from './infra/adapter/output/repositories/prism
     )
 
     await useCase.execute({
-      videoPath: videoPath,
+      filename: videoPath.split('/').pop() as string,
       intervalInSecondsToExtractFrames: 20,
       imageSize: '1920x1080',
       secondsStartExtractingFrames: startTime,

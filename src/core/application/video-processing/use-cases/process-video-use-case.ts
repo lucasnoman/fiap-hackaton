@@ -10,7 +10,7 @@ import { uniqueName } from '@/shared/utils/unique-name-creator'
 import { DirectoryService } from '../services/directory-service'
 
 type processVideoMethod = {
-  videoPath: string
+  filename: string
   intervalInSecondsToExtractFrames: number
   imageSize: string
   secondsStartExtractingFrames: number
@@ -25,13 +25,19 @@ export class ProcessVideoUseCase {
   ) {}
 
   async execute({
-    videoPath,
+    filename,
     intervalInSecondsToExtractFrames,
     imageSize,
     secondsStartExtractingFrames,
     secondsEndExtractingFrames,
   }: processVideoMethod): Promise<void> {
-    const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
+    const videoPath = path.resolve(
+      process.cwd(),
+      'global',
+      'uploaded-videos',
+      filename,
+    )
+    const outputFolder = path.resolve(process.cwd(), 'output', 'frames')
     const zipFilePath = path.resolve(
       process.cwd(),
       'output',
@@ -41,7 +47,11 @@ export class ProcessVideoUseCase {
     DirectoryService.ensureDirectoryExists(outputFolder)
 
     const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
-    const videoInfo = new VideoInformation(videoPath, videoDuration)
+    const videoInfo = VideoInformation.create(
+      videoPath,
+      filename,
+      videoDuration,
+    )
     const video = new Video(videoInfo)
 
     await this.videoRepository.save(video)

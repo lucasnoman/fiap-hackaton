@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import { SQSHandler } from 'aws-lambda'
 import ffmpegPath from 'ffmpeg-static'
@@ -5,18 +7,10 @@ import ffmpeg from 'fluent-ffmpeg'
 
 import { Message } from '@/core/application/queue/value-objects/message-value-object'
 import { ExtractFramesUseCase } from '@/core/application/video-processing/use-cases/extract-frames-use-case'
+import { ExtractFramesEventPayload } from '@/core/application/video-processing/use-cases/process-video-on-queue-use-case'
 import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
 import { FrameExtractorFfmpeg } from '@/infra/adapter/output/external-services/frame-extractor-ffmpeg'
 import { S3Adapter } from '@/infra/adapter/output/s3-adapter'
-
-type MessageBody = {
-  videoPath: string
-  outputFolder: string
-  interval: number
-  imageSize: string
-  startTime: number
-  endTime: number | null
-}
 
 // const pipeline = promisify(stream.pipeline)
 
@@ -30,14 +24,23 @@ if (ffmpegPath) {
 export const handler: SQSHandler = async (event) => {
   for (const record of event.Records) {
     try {
-      const messageBody = JSON.parse(record.body) as Message<MessageBody>
+      const messageBody = JSON.parse(
+        record.body,
+      ) as Message<ExtractFramesEventPayload>
 
       const { payload } = messageBody
 
-      const videoPath = payload.videoPath
-      const outputFolder = payload.outputFolder
-      const startTime = payload.startTime
-      const endTime = payload.endTime
+      const startTime = payload.secondsStartExtractingFrames
+      const endTime = payload.secondsEndExtractingFrames
+      const intervalTime = payload.intervalInSecondsToExtractFrames
+      const imageSize = payload.imageSize
+      const videoPath = payload.storagePath
+      const outputFolder = path.resolve(
+        process.cwd(),
+        'output',
+        'frames',
+        payload.filename,
+      )
 
       console.log(`Processing video: ${videoPath}`)
       console.log(`Output folder: ${outputFolder}`)
@@ -55,8 +58,8 @@ export const handler: SQSHandler = async (event) => {
       await useCase.execute(
         videoPath,
         outputFolder,
-        20,
-        '1920x1080',
+        intervalTime,
+        imageSize,
         startTime,
         endTime,
       )

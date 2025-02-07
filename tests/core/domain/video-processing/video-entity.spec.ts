@@ -5,7 +5,7 @@ import { VideoInformation } from '@/core/domain/video-processing/value-objects/v
 
 describe('Video Entity', () => {
   it('should create a valid Video instance', () => {
-    const info = VideoInformation.create('/path/to/video.mp4', 120)
+    const info = VideoInformation.create('/path/to/video.mp4', 'video.mp4', 120)
     const video = new Video(info)
 
     expect(video.info.path).toBe('/path/to/video.mp4')
@@ -14,7 +14,11 @@ describe('Video Entity', () => {
 
   it('should throw an error if duration is negative', () => {
     expect(() => {
-      const info = VideoInformation.create('/path/to/video.mp4', -10)
+      const info = VideoInformation.create(
+        '/path/to/video.mp4',
+        'video.mp4',
+        -10,
+      )
 
       return new Video(info)
     }).toThrowError('Invalid video duration')

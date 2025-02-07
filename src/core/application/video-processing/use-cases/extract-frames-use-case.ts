@@ -16,16 +16,17 @@ export class ExtractFramesUseCase {
   ) {}
 
   async execute(
-    videoPath: string,
+    storagePath: string,
     outputFolder: string,
     interval: number,
     imageSize: string,
     startTime: number,
     endTime: number | null,
   ): Promise<void> {
-    const videoFile = await this.storage.retrieve(videoPath)
+    const videoFile = await this.storage.retrieve(storagePath)
 
-    const localVideoPath = `/tmp/${videoPath}`
+    const filename = storagePath.split('/').pop() as string
+    const localVideoPath = `/tmp/${storagePath}`
 
     DirectoryService.ensureDirectoryExists(outputFolder)
     DirectoryService.ensureDirectoryExists(localVideoPath.split('.')[0])
@@ -35,8 +36,11 @@ export class ExtractFramesUseCase {
     const videoDuration =
       await this.frameExtractor.getVideoDuration(localVideoPath)
 
-    const info = VideoInformation.create(localVideoPath, videoDuration)
-
+    const info = VideoInformation.create(
+      localVideoPath,
+      filename,
+      videoDuration,
+    )
     const video = new Video(info)
 
     await this.frameExtractor.extractFrames(

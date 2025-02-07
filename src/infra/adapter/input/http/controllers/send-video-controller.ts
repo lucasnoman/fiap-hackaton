@@ -25,9 +25,14 @@ export async function extractVideoFrames(
       content: data.file,
     })
 
+    const sqsQueueName =
+      process.env.SQS_QUEUE_NAME ||
+      'https://sqs.us-east-1.amazonaws.com/979415506381/frame-extractor-queue'
     const videoProcessingUseCase = await makeVideoPocessing()
+
     await videoProcessingUseCase.execute({
-      videoPath: videoMetadata.path,
+      filename: videoMetadata.filename,
+      queueName: sqsQueueName,
       intervalInSecondsToExtractFrames: 1,
       imageSize: '1920x1080',
       secondsStartExtractingFrames: 0,
@@ -35,8 +40,7 @@ export async function extractVideoFrames(
     })
 
     const response: VideoUploadResponse = {
-      message: 'Video processed successfully',
-      filename: videoMetadata.filename,
+      message: 'Video is processing',
     }
 
     await videoUploadingService.cleanUp(videoMetadata)

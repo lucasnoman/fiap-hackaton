@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
@@ -13,14 +15,24 @@ export class VideoInMemoryRepository implements VideoRepository {
   private currentId = 1
 
   mapToDomain(data: InMemoryVideo): Video {
-    const videoInfo = new VideoInformation(data.filename, data.duration)
+    const videoPath = path.resolve(
+      process.cwd(),
+      'global',
+      'uploaded-videos',
+      data.filename,
+    )
+    const videoInfo = VideoInformation.create(
+      videoPath,
+      data.filename,
+      data.duration,
+    )
     return new Video(videoInfo)
   }
 
   mapToRepository(video: Video): InMemoryVideo {
     return {
       id: this.currentId,
-      filename: video.info.path,
+      filename: video.info.filename,
       duration: video.info.duration,
     }
   }
@@ -28,7 +40,7 @@ export class VideoInMemoryRepository implements VideoRepository {
   async save(video: Video): Promise<void> {
     this.videos.push({
       id: this.currentId++,
-      filename: video.info.path,
+      filename: video.info.filename,
       duration: video.info.duration,
     })
   }
@@ -40,7 +52,7 @@ export class VideoInMemoryRepository implements VideoRepository {
 
     this.videos[index] = {
       ...this.videos[index],
-      filename: video.info.path,
+      filename: video.info.filename,
       duration: video.info.duration,
     }
   }
