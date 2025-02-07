@@ -28,7 +28,7 @@ export async function extractVideoFrames(
     const videoProcessingUseCase = await makeVideoPocessing()
     await videoProcessingUseCase.execute({
       videoPath: videoMetadata.path,
-      intervalInSecondsToExtractFrames: 20,
+      intervalInSecondsToExtractFrames: 1,
       imageSize: '1920x1080',
       secondsStartExtractingFrames: 0,
       secondsEndExtractingFrames: null,
