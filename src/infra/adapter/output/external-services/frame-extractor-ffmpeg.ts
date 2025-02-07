@@ -34,24 +34,17 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
   ): Promise<void> {
     const actualEnd = end ?? video.info.duration
 
-    for (
-      let currentTime = start;
-      currentTime < actualEnd;
-      currentTime += interval
-    ) {
-      console.log(`Processando frame: ${currentTime} segundos`)
-
-      await new Promise<void>((resolve, reject) => {
-        ffmpeg(video.info.path)
-          .on('end', () => resolve())
-          .on('error', (err: Error) => reject(err))
-          .screenshots({
-            timestamps: [currentTime],
-            filename: `${uniqueName}__frame_at_${currentTime}.jpg`,
-            folder: outputFolder,
-            size: size,
-          })
-      })
-    }
+    const duration = actualEnd - start
+    await new Promise<void>((resolve, reject) => {
+      ffmpeg(video.info.path)
+        .setStartTime(start)
+        .setDuration(duration)
+        .outputOptions(`-vf fps=1/${interval},scale=${size}`)
+        .outputOptions('-qscale:v 2')
+        .output(`${outputFolder}/${uniqueName}__frame_at_%04d.jpg`)
+        .on('end', () => resolve())
+        .on('error', reject)
+        .run()
+    })
   }
 }
