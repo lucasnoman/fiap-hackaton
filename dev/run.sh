@@ -1,6 +1,6 @@
 #!/bin/bash
 
-devPath="dev/localstack"
+devPath="dev"
 currentLocation=$(pwd)
 
 if [[ "$currentLocation" != *"$devPath"* ]]; then

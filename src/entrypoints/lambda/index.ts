@@ -6,7 +6,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import { Message } from '@/core/application/queue/value-objects/message-value-object'
 import { ExtractFramesUseCase } from '@/core/application/video-processing/use-cases/extract-frames-use-case'
 import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
-import { FrameExtractorFfmpeg } from '@/infra/adapter/output/frame-extractor-ffmpeg'
+import { FrameExtractorFfmpeg } from '@/infra/adapter/output/external-services/frame-extractor-ffmpeg'
 import { S3Adapter } from '@/infra/adapter/output/s3-adapter'
 
 type MessageBody = {

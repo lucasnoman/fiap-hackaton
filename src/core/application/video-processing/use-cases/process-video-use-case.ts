@@ -1,13 +1,13 @@
-import { promises as fs } from 'node:fs'
-
+import path from 'node:path'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
+import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
-import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
+import { ZipCreatorPort } from '@/core/domain/video-processing/ports/zip-creator-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
+import { uniqueName } from '@/shared/utils/unique-name-creator'
 
-import { MessageQueuePort } from '../../queue/ports/message-queue-port'
-import { StoragePort } from '../../storage/ports/storage-port'
+import { DirectoryService } from '../services/directory-service'
 
 type processVideoMethod = {
   videoPath: string
@@ -19,66 +19,42 @@ type processVideoMethod = {
 
 export class ProcessVideoUseCase {
   constructor(
-    // private readonly frameExtractor: FrameExtractorPort,
-    // private readonly zipCreator: ZipCreatorPort,
-    private readonly queue: MessageQueuePort,
-    private readonly storage: StoragePort,
+    private readonly frameExtractor: FrameExtractorPort,
+    private readonly zipCreator: ZipCreatorPort,
     private readonly videoRepository: VideoRepository,
   ) {}
 
-  async execute(
-    videoPath: string,
-    outputFolder: string,
-    zipFilePath: string,
-    interval: number,
-    imageSize: string,
-    startTime: number,
-    endTime: number | null,
-    queueName: string,
-  ): Promise<void> {
-    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${videoPath
-      .split('.')
-      .pop()}`
+  async execute({
+    videoPath,
+    intervalInSecondsToExtractFrames,
+    imageSize,
+    secondsStartExtractingFrames,
+    secondsEndExtractingFrames,
+  }: processVideoMethod): Promise<void> {
+    const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
+    const zipFilePath = path.resolve(
+      process.cwd(),
+      'output',
+      `${uniqueName}.zip`,
+    )
 
-    // const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
-    const videoDuration = 0
-    const info = new VideoInformation(filename, videoDuration)
-    const video = new Video(info)
+    DirectoryService.ensureDirectoryExists(outputFolder)
 
-    const fileContent = await fs.readFile(videoPath)
-
-    const storagePath = `videos/${filename}`
-
-    await this.storage.store(storagePath, fileContent)
+    const videoDuration = await this.frameExtractor.getVideoDuration(videoPath)
+    const videoInfo = new VideoInformation(videoPath, videoDuration)
+    const video = new Video(videoInfo)
 
     await this.videoRepository.save(video)
 
-    const outputFolderPath = `/tmp/frames/${filename.split('.')[0]}`
+    await this.frameExtractor.extractFrames(
+      video,
+      intervalInSecondsToExtractFrames,
+      outputFolder,
+      imageSize,
+      secondsStartExtractingFrames,
+      secondsEndExtractingFrames,
+    )
 
-    //TODO: refactor to use event bus
-    await this.queue.publish(queueName, {
-      event: VideoProcessingEvents.EXTRACT_FRAMES,
-      timestamp: Date.now(),
-      payload: {
-        videoPath: storagePath,
-        outputFolder: outputFolderPath,
-        zipFilePath,
-        interval,
-        imageSize,
-        startTime,
-        endTime,
-      },
-    })
-
-    // await this.frameExtractor.extractFrames(
-    //   video,
-    //   interval,
-    //   outputFolder,
-    //   imageSize,
-    //   startTime,
-    //   endTime,
-    // )
-
-    // await this.zipCreator.createZip(outputFolder, zipFilePath)
+    await this.zipCreator.createZip(outputFolder, zipFilePath)
   }
 }

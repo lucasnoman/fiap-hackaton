@@ -1,5 +1,5 @@
 
-$devPath = "dev\localstack"
+$devPath = "dev"
 $currentLocation = Get-Location
 
 if ($currentLocation.Path -notlike "*$devPath*") {
