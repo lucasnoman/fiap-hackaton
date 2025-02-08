@@ -44,14 +44,47 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push ${{ secrets.API_ECR_REPOSITORY }}:latest
-  # trigger-codebuild:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Trigger AWS CodeBuild
-  #       run: |
-  #         aws codebuild start-build --project-name db-migration
-  #       env:
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+  update-ecs:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Update Database Migrations
+        run: |
+          # Update migration service to run once
+          aws ecs update-service \
+            --cluster fiap-hackaton-cluster \
+            --service migration-service \
+            --desired-count 1
+
+          # Wait for migration task to complete
+          aws ecs wait services-stable \
+            --cluster fiap-hackaton-cluster \
+            --services migration-service
+
+          # Set migration service back to 0
+          aws ecs update-service \
+            --cluster fiap-hackaton-cluster \
+            --service migration-service \
+            --desired-count 0
+
+      - name: Update API Service
+        run: |
+          # Force new deployment of API service
+          aws ecs update-service \
+            --cluster fiap-hackaton-cluster \
+            --service api-service \
+            --force-new-deployment
+
+          # Wait for service to stabilize
+          aws ecs wait services-stable \
+            --cluster fiap-hackaton-cluster \
+            --services api-service
