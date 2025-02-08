@@ -24,6 +24,23 @@ services:
     ports:
       - 9090:9090
 
+  sonarqube:
+    image: docker.io/bitnami/sonarqube:25
+    ports:
+      - '80:9000'
+    volumes:
+      - 'sonarqube_data:/bitnami/sonarqube'
+    depends_on:
+      - postgres
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - SONARQUBE_DATABASE_HOST=postgres
+      - SONARQUBE_DATABASE_PORT_NUMBER=5432
+      - SONARQUBE_DATABASE_USER=${CONTAINER_POSTGRES_USER}
+      - SONARQUBE_DATABASE_NAME=${CONTAINER_POSTGRES_DB}
+      - SONARQUBE_DATABASE_PASSWORD=${CONTAINER_POSTGRES_PASSWORD}
+
 volumes:
   postgres_data:
   grafana-storage:
+  sonarqube_data:
