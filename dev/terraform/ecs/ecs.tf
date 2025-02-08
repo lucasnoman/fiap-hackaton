@@ -63,45 +63,6 @@ resource "aws_ecs_task_definition" "api_task" {
   ])
 }
 
-# Task definition for database migrations
-resource "aws_ecs_task_definition" "migration_task" {
-  family                   = "migration-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "512"  # Increased CPU
-  memory                   = "1024" # Increased memory
-  execution_role_arn       = var.lab_role
-  task_role_arn            = var.lab_role
-  container_definitions = jsonencode([
-    {
-      name    = "migration"
-      image   = var.api_image_uri
-      command = ["sh", "-c", "npm install && npx prisma generate && npx prisma migrate deploy"]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = "/ecs/migration-task"
-          "awslogs-region"        = var.aws_region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
-      environment = [
-        {
-          name  = "DATABASE_URL"
-          value = "postgresql://${var.postgres_user}:${var.postgres_password}@${var.postgres_endpoint}/${var.postgres_db_name}"
-        },
-        {
-          name  = "NODE_ENV"
-          value = "production"
-        }
-      ],
-      essential    = true,
-      stopTimeout  = 120,
-      startTimeout = 120
-    }
-  ])
-}
-
 # Application Load Balancer for API
 resource "aws_lb" "api_alb" {
   name               = "api-alb"
@@ -148,7 +109,6 @@ resource "aws_ecs_service" "api_service" {
   task_definition = aws_ecs_task_definition.api_task.arn
   desired_count   = 1
   launch_type     = "FARGATE"
-  depends_on      = [aws_ecs_service.migration_service]
 
   network_configuration {
     subnets          = var.public_subnets
@@ -163,30 +123,7 @@ resource "aws_ecs_service" "api_service" {
   }
 }
 
-# ECS Service for migrations
-resource "aws_ecs_service" "migration_service" {
-  name            = "migration-service"
-  cluster         = aws_ecs_cluster.app_cluster.id
-  task_definition = aws_ecs_task_definition.migration_task.arn
-  desired_count   = 0
-  launch_type     = "FARGATE"
-
-  network_configuration {
-    subnets          = var.private_subnets
-    assign_public_ip = true # Temporarily true for troubleshooting
-    security_groups  = var.api_service_sg_ids
-  }
-
-  # Prevent auto scaling
-  enable_execute_command = true
-}
-
 resource "aws_cloudwatch_log_group" "api_logs" {
   name              = "/ecs/api-task"
-  retention_in_days = 30
-}
-
-resource "aws_cloudwatch_log_group" "migration_logs" {
-  name              = "/ecs/migration-task"
   retention_in_days = 30
 }

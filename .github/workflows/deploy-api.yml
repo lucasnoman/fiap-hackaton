@@ -60,35 +60,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check for migration changes
-        id: check_changes
-        run: |
-          if git diff --quiet HEAD^ HEAD -- prisma/migrations/; then
-            echo "changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "changes=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Update Database Migrations
-        if: steps.check_changes.outputs.changes == 'true'
-        run: |
-          # Update migration service to run once
-          aws ecs update-service \
-            --cluster fiap-hackaton-cluster \
-            --service migration-service \
-            --desired-count 1
-
-          # Wait for migration task to complete
-          aws ecs wait services-stable \
-            --cluster fiap-hackaton-cluster \
-            --services migration-service
-
-          # Set migration service back to 0
-          aws ecs update-service \
-            --cluster fiap-hackaton-cluster \
-            --service migration-service \
-            --desired-count 0
-
       - name: Update API Service
         run: |
           # Force new deployment of API service
