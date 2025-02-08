@@ -22,6 +22,7 @@ const envSchema = z.object({
 
   // AWS Services
   SQS_QUEUE_NAME: z.string().min(1).max(80),
+  SQS_QUEUE_NAME_SUBSCRIPTION: z.string().min(1).max(80),
 })
 
 const _env = envSchema.safeParse(process.env)
