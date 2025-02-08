@@ -56,7 +56,7 @@ resource "aws_security_group" "api_alb_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = 80
+    from_port   = var.api_container_port
     to_port     = var.api_container_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
@@ -110,3 +110,27 @@ resource "aws_security_group" "postgres_service_sg" {
   }
 }
 
+#############################
+# EFS for PostgreSQL Data
+#############################
+resource "aws_efs_file_system" "postgres_efs" {
+  creation_token = "postgres-efs"
+  lifecycle_policy {
+    transition_to_ia = "AFTER_14_DAYS"
+  }
+}
+
+#############################
+# Outputs
+#############################
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+
+output "public_subnets" {
+  value = aws_subnet.public[*].id
+}
+
+output "private_subnets" {
+  value = aws_subnet.private[*].id
+}

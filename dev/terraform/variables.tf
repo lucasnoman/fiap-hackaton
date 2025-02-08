@@ -66,13 +66,13 @@ variable "postgres_image_uri" {
 
 variable "postgres_db_name" {
   type        = string
-  default     = "fiap-hackaton"
+  default     = "fiaphackaton"
   description = "The PostgreSQL database name."
 }
 
 variable "postgres_user" {
   type        = string
-  default     = "fiap-hackaton"
+  default     = "fiaphackaton"
   description = "The PostgreSQL username."
 }
 

@@ -11,72 +11,53 @@ resource "aws_ecs_task_definition" "api_task" {
   cpu                      = "256"
   memory                   = "512"
   execution_role_arn       = var.lab_role
+  task_role_arn            = var.lab_role
   container_definitions = jsonencode([
     {
       name  = "api"
       image = var.api_image_uri
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/api-task"
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
       portMappings = [
         {
-          containerPort = var.api_container_port, # e.g., 80
+          containerPort = var.api_container_port,
           hostPort      = var.api_container_port,
           protocol      = "tcp"
         }
       ],
-      essential = true
-    }
-  ])
-}
-
-# Task definition for PostgreSQL container
-resource "aws_ecs_task_definition" "postgres_task" {
-  family                   = "postgres-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
-  execution_role_arn       = var.lab_role
-
-  volume {
-    name = "postgres-data"
-    efs_volume_configuration {
-      file_system_id     = var.postgres_efs_id
-      transit_encryption = "ENABLED"
-    }
-  }
-
-  container_definitions = jsonencode([
-    {
-      name  = "postgres"
-      image = var.postgres_image_uri
-      portMappings = [
-        {
-          containerPort = 5432,
-          hostPort      = 5432,
-          protocol      = "tcp"
-        }
-      ],
-      essential = true,
       environment = [
         {
-          name  = "POSTGRES_DB",
-          value = var.postgres_db_name
+          name  = "NODE_ENV"
+          value = "production"
         },
         {
-          name  = "POSTGRES_USER",
-          value = var.postgres_user
+          name  = "DATABASE_URL"
+          value = "postgresql://${var.postgres_user}:${var.postgres_password}@${var.postgres_endpoint}/${var.postgres_db_name}"
         },
         {
-          name  = "POSTGRES_PASSWORD",
-          value = var.postgres_password
+          name  = "PORT"
+          value = tostring(var.api_container_port)
+        },
+        {
+          name  = "AWS_REGION"
+          value = "${var.aws_region}"
+        },
+        {
+          name  = "SQS_QUEUE_NAME",
+          value = "${var.sqs_frame_extractor_url}"
+        },
+        {
+          name  = "AWS_PROFILE",
+          value = "default"
         }
       ],
-      mountPoints = [
-        {
-          sourceVolume  = "postgres-data"
-          containerPath = "/var/lib/postgresql/data"
-          readOnly      = false
-        }
-      ]
+      essential = true
     }
   ])
 }
@@ -96,16 +77,24 @@ resource "aws_lb_target_group" "api_tg" {
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
+
   health_check {
-    path     = "/"
-    protocol = "HTTP"
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 10
+    timeout             = 60
+    interval            = 300
+    matcher             = "200,301,302"
+    path                = "/health"
+    protocol            = "HTTP"
   }
 }
 
 resource "aws_lb_listener" "api_listener" {
   load_balancer_arn = aws_lb.api_alb.arn
-  port              = var.api_container_port
+  port              = 80
   protocol          = "HTTP"
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.api_tg.arn
@@ -133,17 +122,8 @@ resource "aws_ecs_service" "api_service" {
   }
 }
 
-# ECS Service for PostgreSQL on private subnets
-resource "aws_ecs_service" "postgres_service" {
-  name            = "postgres-service"
-  cluster         = aws_ecs_cluster.app_cluster.id
-  task_definition = aws_ecs_task_definition.postgres_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
 
-  network_configuration {
-    subnets          = var.private_subnets
-    assign_public_ip = false
-    security_groups  = var.postgres_service_sg_ids
-  }
+resource "aws_cloudwatch_log_group" "api_logs" {
+  name              = "/ecs/api-task"
+  retention_in_days = 30
 }

@@ -18,9 +18,9 @@ variable "api_container_port" {
   description = "Port of the API container."
 }
 
-variable "postgres_image_uri" {
+variable "postgres_endpoint" {
   type        = string
-  description = "URI for the PostgreSQL container image in ECR."
+  description = "The PostgreSQL endpoint."
 }
 
 variable "postgres_db_name" {
@@ -36,11 +36,6 @@ variable "postgres_user" {
 variable "postgres_password" {
   type        = string
   description = "The PostgreSQL user's password."
-}
-
-variable "postgres_efs_id" {
-  type        = string
-  description = "ID of the EFS file system for the PostgreSQL service."
 }
 
 
@@ -65,12 +60,19 @@ variable "api_service_sg_ids" {
   description = "Security groups for the API ECS service."
 }
 
-variable "postgres_service_sg_ids" {
-  type        = list(string)
-  description = "Security groups for the PostgreSQL ECS service."
-}
 
 variable "vpc_id" {
   type        = string
   description = "VPC ID where ECS services and ALB are deployed."
+}
+
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region for the ECS services."
+}
+
+variable "sqs_frame_extractor_url" {
+  type        = string
+  description = "URL for the SQS queue to use for the frame extractor."
 }
