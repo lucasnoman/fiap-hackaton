@@ -11,7 +11,7 @@ on:
       - 'docker/api/Dockerfile'
       - 'src/**'
 
-      - 'wait-for-db.sh'
+      - 'prisma/migrations/**'
 
 jobs:
   deploy:
