@@ -2,6 +2,7 @@ import { fastifyCors } from '@fastify/cors'
 import { fastifyMultipart } from '@fastify/multipart'
 import { fastifySwagger } from '@fastify/swagger'
 import fastify from 'fastify'
+import metricsPlugin from 'fastify-metrics'
 import {
   jsonSchemaTransform,
   serializerCompiler,
@@ -37,6 +38,7 @@ app.register(import('@scalar/fastify-api-reference'), {
   configuration: { theme: 'elysiajs' },
 })
 
+app.register(metricsPlugin, { endpoint: '/metrics' })
 app.register(setupRoutes)
 
 app.setErrorHandler((error, _request, reply) => {
