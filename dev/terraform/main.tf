@@ -9,29 +9,7 @@ terraform {
 }
 
 provider "aws" {
-  # Fake credentials just to satisfy Terraform requirements.
-  #   access_key                  = "test"
-  #   secret_key                  = "test"
   region = var.aws_region
-  #   profile = "default"
-
-
-
-  #   skip_credentials_validation = true
-  #   skip_metadata_api_check     = true
-  #   skip_requesting_account_id  = true
-  #   s3_use_path_style           = true
-
-  # LocalStack endpoints
-  #   endpoints {
-  #     s3             = var.localstack_endpoint
-  #     sqs            = var.localstack_endpoint
-  #     lambda         = var.localstack_endpoint
-  #     iam            = var.localstack_endpoint
-  #     ecr            = var.localstack_endpoint
-  #     # If you need more services (e.g., CloudWatch, CloudFormation),
-  #     # list them here with the same LocalStack endpoint
-  #   }
 }
 
 
@@ -81,54 +59,6 @@ resource "aws_lambda_permission" "allow_sqs_send_message" {
   principal     = "sqs.amazonaws.com"
   source_arn    = aws_sqs_queue.completion_queue.arn
 }
-
-# data "aws_iam_policy_document" "lambda_assume_role" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
-#     principals {
-#       type        = "Service"
-#       identifiers = ["lambda.amazonaws.com"]
-#     }
-#   }
-# }
-
-# resource "aws_iam_role" "lambda_exec" {
-#   name               = "${var.lambda_name}-exec-role"
-#   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-# }
-
-# # Attach the AWSLambdaBasicExecutionRole policy (simulated in LocalStack)
-# resource "aws_iam_role_policy_attachment" "lambda_basic_execution_attachment" {
-#   role       = aws_iam_role.lambda_exec.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-# }
-
-# Additional permissions if your Lambda needs to read/write from S3
-# data "aws_iam_policy_document" "lambda_s3_access" {
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "s3:GetObject",
-#       "s3:ListBucket",
-#       "s3:PutObject"
-#     ]
-#     resources = [
-#       aws_s3_bucket.files.arn,
-#       "${aws_s3_bucket.files.arn}/*"
-#     ]
-#   }
-# }
-
-# resource "aws_iam_policy" "lambda_s3_policy" {
-#   name   = "${var.lambda_name}-s3-policy"
-#   policy = data.aws_iam_policy_document.lambda_s3_access.json
-# }
-
-# resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
-#   role       = aws_iam_role.lambda_exec.name
-#   policy_arn = aws_iam_policy.lambda_s3_policy.arn
-# }
-
 
 resource "aws_lambda_function" "lambda_docker" {
   function_name = var.lambda_name
