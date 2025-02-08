@@ -24,14 +24,6 @@ COPY --from=builder /app/prisma ./prisma
 
 RUN npx prisma generate
 
-
-# Create a script to check DB connection before running migrations
-COPY wait-for-db.sh ./wait-for-db.sh
-RUN chmod +x wait-for-db.sh
-
-# Run migration in an entrypoint script instead of inside Dockerfile
-ENTRYPOINT ["./wait-for-db.sh"]
-
 # Set environment variables (adjust as needed, e.g., PORT)
 ENV NODE_ENV=production
 ENV PORT=3000
