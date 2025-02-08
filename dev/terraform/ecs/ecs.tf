@@ -14,8 +14,9 @@ resource "aws_ecs_task_definition" "api_task" {
   task_role_arn            = var.lab_role
   container_definitions = jsonencode([
     {
-      name  = "api"
-      image = var.api_image_uri
+      name    = "api"
+      image   = var.api_image_uri
+      command = ["sh", "-c", "npm install && npx prisma generate && npx prisma migrate deploy && node build/server.js"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
