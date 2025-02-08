@@ -40,7 +40,7 @@ export async function extractVideoFrames(
     })
 
     const response: VideoUploadResponse = {
-      message: 'Video is processing',
+      message: 'Video is processing, wait a moment...',
     }
 
     //TODO: FIX: this is generate concurrency error
