@@ -154,3 +154,4 @@ output/*
 video-test.mp4
 
 build
+.env-docker-image-test

@@ -135,7 +135,7 @@ resource "aws_lambda_function" "lambda_docker" {
   package_type  = "Image"
   image_uri     = var.lambda_image_uri
   #   role          = aws_iam_role.lambda_exec.arn
-  role = "arn:aws:iam::979415506381:role/LabRole"
+  role = var.lab_role
 
   # In real AWS, you can set memory, timeout, environment, etc.
   # LocalStack does not enforce all these the same way, but it's good to keep them:
@@ -157,6 +157,40 @@ resource "aws_lambda_event_source_mapping" "lambda_sqs_mapping" {
 
   # Adjust if needed
   batch_size = 10
+}
+
+module "network" {
+  source = "./network"
+
+  api_container_port = var.api_container_port
+}
+
+module "efs" {
+  source                  = "./efs"
+  private_subnets         = module.network.private_subnets
+  postgres_service_sg_ids = [module.network.postgres_service_sg_id]
+}
+
+module "ecs" {
+  source = "./ecs"
+
+  ecs_cluster_name        = var.ecs_cluster_name
+  lab_role                = var.lab_role
+  api_image_uri           = var.api_image_uri
+  api_container_port      = var.api_container_port
+  postgres_image_uri      = var.postgres_image_uri
+  postgres_db_name        = var.postgres_db_name
+  postgres_user           = var.postgres_user
+  postgres_password       = var.postgres_password
+  public_subnets          = module.network.public_subnets
+  private_subnets         = module.network.private_subnets
+  api_alb_sg_ids          = [module.network.api_alb_sg_id]
+  api_service_sg_ids      = [module.network.api_service_sg_id]
+  vpc_id                  = module.network.vpc_id
+  postgres_service_sg_ids = [module.network.postgres_service_sg_id]
+  # # Pass the EFS file system id from the efs module
+  postgres_efs_id = module.efs.postgres_efs_id
+  # efs_file_system_id = module.efs.aws_efs_file_system_postgres_efs_id
 }
 
 output "bucket_name" {
