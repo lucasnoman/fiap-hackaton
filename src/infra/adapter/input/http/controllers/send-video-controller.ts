@@ -43,7 +43,8 @@ export async function extractVideoFrames(
       message: 'Video is processing',
     }
 
-    await videoUploadingService.cleanUp(videoMetadata)
+    //TODO: FIX: this is generate concurrency error
+    // await videoUploadingService.cleanUp(videoMetadata)
 
     return reply.status(201).send(response)
   } catch (error) {

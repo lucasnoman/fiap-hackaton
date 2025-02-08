@@ -19,10 +19,10 @@ export class UploadVideoService {
       throw new Error(`Invalid file type: ${video.mimetype}`)
     }
 
-    return this.videoStorage.save(video)
+    return await this.videoStorage.save(video)
   }
 
   async cleanUp(video: VideoMetadata): Promise<void> {
-    return this.videoStorage.delete(video)
+    return await this.videoStorage.delete(video)
   }
 }
