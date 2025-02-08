@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { makeVideoPocessing } from '@/infra/adapter/factories/make-video-processing'
 import { makeVideoUpload } from '@/infra/adapter/factories/make-video-upload'
 import { sendMail } from '@/infra/adapter/output/external-services/email'
+import { sqsVideoExtractionConfig } from '@/infra/config/aws-services'
 
 import { VideoUploadError, VideoUploadResponse } from '../dtos/send-video-dto'
 
@@ -26,9 +27,7 @@ export async function extractVideoFrames(
       content: data.file,
     })
 
-    const sqsQueueName =
-      process.env.SQS_QUEUE_NAME ||
-      'https://sqs.us-east-1.amazonaws.com/979415506381/frame-extractor-queue'
+    const sqsQueueName = sqsVideoExtractionConfig.queueName
     const videoProcessingUseCase = await makeVideoPocessing()
 
     await videoProcessingUseCase.execute({

@@ -53,6 +53,7 @@ export const handler: SQSHandler = async (event) => {
       // const outputPrefix = messageBody.outputPrefix || 'frames'
 
       const frameExtractor = new FrameExtractorFfmpeg()
+      // TODO: Use from config s3ConfigStorage but we need configure envs to this lambda function
       const s3Storage = new S3Adapter('frame-extractor-bucket-210932-nmvzbm91')
       const useCase = new ExtractFramesUseCase(frameExtractor, s3Storage)
       await useCase.execute(
