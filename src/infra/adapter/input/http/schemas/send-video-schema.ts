@@ -12,7 +12,7 @@ export const headerSchema = z
 export const responseSchema = {
   201: z.object({
     message: z.string().default('Video processed successfully'),
-    filename: z.string(),
+    filename: z.string().optional(),
   }),
   400: z.object({
     error: z.string().default('No video file provided'),

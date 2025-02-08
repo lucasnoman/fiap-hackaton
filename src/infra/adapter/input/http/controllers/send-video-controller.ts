@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { makeVideoPocessing } from '@/infra/adapter/factories/make-video-processing'
 import { makeVideoUpload } from '@/infra/adapter/factories/make-video-upload'
 import { sendMail } from '@/infra/adapter/output/external-services/email'
+import { sqsVideoExtractionConfig } from '@/infra/config/aws-services'
 
 import { VideoUploadError, VideoUploadResponse } from '../dtos/send-video-dto'
 
@@ -26,21 +27,24 @@ export async function extractVideoFrames(
       content: data.file,
     })
 
+    const sqsQueueName = sqsVideoExtractionConfig.queueName
     const videoProcessingUseCase = await makeVideoPocessing()
+
     await videoProcessingUseCase.execute({
-      videoPath: videoMetadata.path,
-      intervalInSecondsToExtractFrames: 20,
+      filename: videoMetadata.filename,
+      queueName: sqsQueueName,
+      intervalInSecondsToExtractFrames: 1,
       imageSize: '1920x1080',
       secondsStartExtractingFrames: 0,
       secondsEndExtractingFrames: null,
     })
 
     const response: VideoUploadResponse = {
-      message: 'Video processed successfully',
-      filename: videoMetadata.filename,
+      message: 'Video is processing, wait a moment...',
     }
 
-    await videoUploadingService.cleanUp(videoMetadata)
+    //TODO: FIX: this is generate concurrency error
+    // await videoUploadingService.cleanUp(videoMetadata)
 
     return reply.status(201).send(response)
   } catch (error) {

@@ -1,0 +1,69 @@
+name: Deploy API to ECR
+
+on:
+  push:
+    branches:
+      - main
+      - feature/poc-infrastructure
+    paths:
+      - '.github/workflows/deploy-api.yml'
+      - tsconfig.json
+      - 'docker/api/Dockerfile'
+      - 'src/**'
+
+      - 'prisma/migrations/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Docker image
+        run: |
+          docker build --no-cache -t ${{ secrets.API_ECR_REPOSITORY }}:latest -f ./docker/api/Dockerfile .
+
+      - name: Tag Docker image
+        run: |
+          docker tag ${{ secrets.API_ECR_REPOSITORY }}:latest ${{ secrets.API_ECR_REPOSITORY }}:latest
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ secrets.API_ECR_REPOSITORY }}:latest
+
+  update-ecs:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update API Service
+        run: |
+          # Force new deployment of API service
+          aws ecs update-service \
+            --cluster fiap-hackaton-cluster \
+            --service api-service \
+            --force-new-deployment

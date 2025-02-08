@@ -1,5 +1,8 @@
+import path from 'node:path'
+
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
+import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
 
 type InMemoryVideo = {
   id: number
@@ -12,34 +15,45 @@ export class VideoInMemoryRepository implements VideoRepository {
   private currentId = 1
 
   mapToDomain(data: InMemoryVideo): Video {
-    return new Video(data.filename, data.duration)
+    const videoPath = path.resolve(
+      process.cwd(),
+      'global',
+      'uploaded-videos',
+      data.filename,
+    )
+    const videoInfo = VideoInformation.create(
+      videoPath,
+      data.filename,
+      data.duration,
+    )
+    return new Video(videoInfo)
   }
 
   mapToRepository(video: Video): InMemoryVideo {
     return {
       id: this.currentId,
-      filename: video.path,
-      duration: video.duration,
+      filename: video.info.filename,
+      duration: video.info.duration,
     }
   }
 
   async save(video: Video): Promise<void> {
     this.videos.push({
       id: this.currentId++,
-      filename: video.path,
-      duration: video.duration,
+      filename: video.info.filename,
+      duration: video.info.duration,
     })
   }
 
   async update(video: Video): Promise<void> {
-    const index = this.videos.findIndex((v) => v.filename === video.path)
+    const index = this.videos.findIndex((v) => v.filename === video.info.path)
 
     if (index === -1) throw new Error('Video not found')
 
     this.videos[index] = {
       ...this.videos[index],
-      filename: video.path,
-      duration: video.duration,
+      filename: video.info.filename,
+      duration: video.info.duration,
     }
   }
 

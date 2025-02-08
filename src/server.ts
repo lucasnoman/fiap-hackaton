@@ -7,3 +7,5 @@ app
     port: env.PORT,
   })
   .then(() => console.log(`Server is running on http://localhost:${env.PORT}`))
+
+import './worker'
