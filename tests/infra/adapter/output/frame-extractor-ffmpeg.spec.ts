@@ -2,6 +2,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Video } from '@/core/domain/video-processing/entities/video'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 import { FrameExtractorFfmpeg } from '@/infra/adapter/output/external-services/frame-extractor-ffmpeg'
 
 vi.mock('fluent-ffmpeg')
@@ -36,7 +37,14 @@ describe('FrameExtractorFfmpeg', () => {
 
   describe('extractFrames', () => {
     it('should handle errors during frame extraction', async () => {
-      const video: Video = { path: 'test.mp4', duration: 120 }
+      const video: Video = {
+        info: {
+          path: 'test.mp4',
+          filename: 'test.mp4',
+          duration: 120,
+        },
+        status: VideoStatus.PROCESSING,
+      }
       const interval = 10
       const outputFolder = 'output'
       const size = '320x240'
@@ -50,8 +58,9 @@ describe('FrameExtractorFfmpeg', () => {
         return { on: onMock }
       })
 
-      // it's a vitest mock method coming from line 7
-      ffmpeg.mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+      const ffmpegMock = ffmpeg as unknown as { mockReturnValue: Function }
+      ffmpegMock.mockReturnValue({
         screenshots: screenshotsMock,
         on: onMock,
       })

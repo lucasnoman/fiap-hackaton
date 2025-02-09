@@ -5,6 +5,7 @@ import { join } from 'path'
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-extractor-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 
 import { StoragePort } from '../../storage/ports/storage-port'
 import { DirectoryService } from '../services/directory-service'
@@ -41,7 +42,7 @@ export class ExtractFramesUseCase {
       filename,
       videoDuration,
     )
-    const video = new Video(info)
+    const video = new Video(info, VideoStatus.PROCESSING)
 
     await this.frameExtractor.extractFrames(
       video,

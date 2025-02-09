@@ -15,9 +15,15 @@ describe('ProcessVideoUseCase', () => {
   let zipCreator: ZipCreatorPort
   let processVideoUseCase: ProcessVideoUseCase
 
-  const OUTPUTFOLDER = path.resolve(process.cwd(), 'output', 'Images')
+  const OUTPUTFOLDER = path.resolve(process.cwd(), 'output', 'frames')
   const ZIPFILEPATH = path.resolve(process.cwd(), 'output', `${uniqueName}.zip`)
-  const VIDEOPATH = 'test-video.mp4'
+  const VIDEOFILENAME = 'test-video.mp4'
+  const VIDEOPATH = path.resolve(
+    process.cwd(),
+    'global',
+    'uploaded-videos',
+    VIDEOFILENAME,
+  )
   const INTERVALINSECONDSTOEXTRACTFRAMES = 1
   const IMAGESIZE = '1280x720'
   const SECONDSSTARTEXTRACTINGFRAMES = 0
@@ -50,7 +56,7 @@ describe('ProcessVideoUseCase', () => {
     vi.mocked(frameExtractor.getVideoDuration).mockResolvedValue(MOCKDURATION)
 
     await processVideoUseCase.execute({
-      videoPath: VIDEOPATH,
+      filename: VIDEOPATH,
       intervalInSecondsToExtractFrames: INTERVALINSECONDSTOEXTRACTFRAMES,
       imageSize: IMAGESIZE,
       secondsStartExtractingFrames: SECONDSSTARTEXTRACTINGFRAMES,
@@ -76,7 +82,7 @@ describe('ProcessVideoUseCase', () => {
     vi.mocked(frameExtractor.getVideoDuration).mockResolvedValue(MOCKDURATION)
 
     await processVideoUseCase.execute({
-      videoPath: VIDEOPATH,
+      filename: VIDEOPATH,
       intervalInSecondsToExtractFrames: INTERVALINSECONDSTOEXTRACTFRAMES,
       imageSize: IMAGESIZE,
       secondsStartExtractingFrames: SECONDSSTARTEXTRACTINGFRAMES,
