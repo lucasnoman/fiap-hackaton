@@ -123,6 +123,10 @@ module "ecs" {
   postgres_password       = var.postgres_password
   aws_region              = var.aws_region
   sqs_frame_extractor_url = aws_sqs_queue.queue.url
+
+  resend_api_key                       = "RESEND_API_KEY"
+  s3_frame_extractor_url               = aws_s3_bucket.files.bucket
+  sqs_frame_extractor_url_subscription = aws_sqs_queue.completion_queue.url
 }
 
 output "bucket_name" {
