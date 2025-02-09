@@ -4,10 +4,22 @@ import { ProcessVideoUseCase } from './core/application/video-processing/use-cas
 import { getVideoInput } from './infra/adapter/input/video-input'
 import { FrameExtractorFfmpeg } from './infra/adapter/output/frame-extractor-ffmpeg'
 import { ZipCreatorArchiver } from './infra/adapter/output/zip-creator-archiver'
+
+import { AuthUseCase  } from './core/application/authentication/use-cases/auth-use-case'
+
 ;(async () => {
   console.log('Process started...')
 
   try {
+
+    const authUseCase = new AuthUseCase()
+    const username = 'exampleUser';
+    const password = 'examplePassword';
+    const token = await authUseCase.authenticateUser(username, password)
+    console.log('Autenticação bem-sucedida. Token: ', token);
+
+
+
     const { videoPath, startTime, endTime } = await getVideoInput()
 
     const outputFolder = path.resolve(process.cwd(), 'output', 'Images')
