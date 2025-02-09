@@ -37,14 +37,15 @@ describe('FrameExtractorFfmpeg', () => {
 
   describe('extractFrames', () => {
     it('should handle errors during frame extraction', async () => {
-      const video: Video = {
-        info: {
+      const video = new Video(
+        {
           path: 'test.mp4',
           filename: 'test.mp4',
           duration: 120,
         },
-        status: VideoStatus.PROCESSING,
-      }
+        VideoStatus.PROCESSING,
+      )
+
       const interval = 10
       const outputFolder = 'output'
       const size = '320x240'

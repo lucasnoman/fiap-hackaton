@@ -5,13 +5,12 @@ export class ProcessedVideoEventHandler {
   constructor(private readonly videoRepository: VideoRepository) {}
 
   async handle(event: ProcessedVideoEvent) {
-    const video = await this.videoRepository.findByFilename(event.videoPath)
+    const video = await this.videoRepository.findByFilename(event.filename)
     if (!video) {
       throw new Error('Video not found')
     }
 
-    // TODO: update video status add column on migrations
-    // video.status = event.status
+    video.setStatus(event.status)
     await this.videoRepository.save(video)
   }
 }
