@@ -1,6 +1,7 @@
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -47,6 +48,32 @@ export class S3Adapter implements StoragePort {
         Key: path,
       }),
     )
+  }
+
+  async list(prefix: string): Promise<string[]> {
+    const response = await this.client.send(
+      new ListObjectsV2Command({
+        Bucket: this.bucket,
+        Prefix: prefix,
+      }),
+    )
+
+    return (response.Contents || [])
+      .map((item) => item.Key!)
+      .filter((key) => key !== prefix)
+  }
+
+  async retrieveMany(paths: string[]): Promise<Map<string, Buffer>> {
+    const result = new Map<string, Buffer>()
+
+    await Promise.all(
+      paths.map(async (path) => {
+        const buffer = await this.retrieve(path)
+        result.set(path, buffer)
+      }),
+    )
+
+    return result
   }
 }
 

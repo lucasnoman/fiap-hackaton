@@ -20,4 +20,18 @@ export interface StoragePort {
    * @returns A promise that resolves when the file is deleted.
    */
   delete(path: string): Promise<void>
+
+  /**
+   * Lists files in a directory with the given prefix.
+   * @param prefix The prefix to filter files.
+   * @returns A promise that resolves with an array of file paths.
+   */
+  list(prefix: string): Promise<string[]>
+
+  /**
+   * Retrieves multiple files from the given paths.
+   * @param paths The paths of the files to retrieve.
+   * @returns A promise that resolves with a map of file paths to file content as Buffers.
+   */
+  retrieveMany(paths: string[]): Promise<Map<string, Buffer>>
 }
