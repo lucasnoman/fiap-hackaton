@@ -21,8 +21,8 @@ const envSchema = z.object({
   S3_BUCKET_NAME: z.string().min(1).max(63),
 
   // AWS Services
-  SQS_QUEUE_NAME: z.string().min(1).max(80),
-  SQS_QUEUE_NAME_SUBSCRIPTION: z.string().min(1).max(80),
+  SQS_QUEUE_NAME: z.string().min(1),
+  SQS_QUEUE_NAME_SUBSCRIPTION: z.string().min(1),
 })
 
 const _env = envSchema.safeParse(process.env)
