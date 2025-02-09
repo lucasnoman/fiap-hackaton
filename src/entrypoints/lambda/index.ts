@@ -39,7 +39,6 @@ export const handler: SQSHandler = async (event) => {
       const videoPath = payload.storagePath
       const outputFolder = path.resolve(
         '/tmp',
-        'output',
         'frames',
         payload.filename.split('.')[0],
       )
