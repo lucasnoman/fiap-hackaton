@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - feature/poc-infrastructure
+      - feature/video-routes
     paths:
       - '.github/workflows/deploy-api.yml'
       - tsconfig.json
