@@ -11,8 +11,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "build": "tsup src --out-dir build",
-    "build:lambda": "tsc -p tsconfig.lambda.json && tscpaths -p tsconfig.lambda.json -s ./src -o ./dist",
-    "prepare": "husky install"
+    "build:lambda": "tsc -p tsconfig.lambda.json && tscpaths -p tsconfig.lambda.json -s ./src -o ./dist"
   },
   "keywords": [],
   "author": "",
