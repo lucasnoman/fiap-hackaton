@@ -79,7 +79,10 @@ describe('ProcessVideoUseCase', () => {
       SECONDSSTARTEXTRACTINGFRAMES,
       SECONDSENDEXTRACTINGFRAMES,
     )
-    expect(zipCreator.createZip).toHaveBeenCalledWith(OUTPUTFOLDER, ZIPFILEPATH)
+    expect(zipCreator.createZip).toHaveBeenCalledWith(
+      OUTPUTFOLDER,
+      expect.stringMatching(/^.*[/\\]output[/\\]video-.*\.zip$/),
+    )
   })
 
   it('should handle video processing with null endTime', async () => {
@@ -105,6 +108,9 @@ describe('ProcessVideoUseCase', () => {
       SECONDSSTARTEXTRACTINGFRAMES,
       SECONDSENDEXTRACTINGFRAMES,
     )
-    expect(zipCreator.createZip).toHaveBeenCalledWith(OUTPUTFOLDER, ZIPFILEPATH)
+    expect(zipCreator.createZip).toHaveBeenCalledWith(
+      OUTPUTFOLDER,
+      expect.stringMatching(/^.*[/\\]output[/\\]video-.*\.zip$/),
+    )
   })
 })

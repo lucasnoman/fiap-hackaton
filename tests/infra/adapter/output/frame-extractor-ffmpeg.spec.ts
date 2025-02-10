@@ -46,36 +46,26 @@ describe('FrameExtractorFfmpeg', () => {
         VideoStatus.PROCESSING,
       )
 
-      const interval = 10
-      const outputFolder = 'output'
-      const size = '320x240'
-      const start = 0
-      const end = 30
       const error = new Error('ffmpeg error')
-
-      const screenshotsMock = vi.fn().mockReturnThis()
-      const onMock = vi.fn().mockImplementation((event, callback) => {
-        if (event === 'error') callback(error)
-        return { on: onMock }
-      })
+      const mockFfmpeg = {
+        setStartTime: vi.fn().mockReturnThis(),
+        setDuration: vi.fn().mockReturnThis(),
+        outputOptions: vi.fn().mockReturnThis(),
+        output: vi.fn().mockReturnThis(),
+        on: vi.fn((event, callback) => {
+          if (event === 'error') callback(error)
+          return mockFfmpeg
+        }),
+        run: vi.fn(),
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
       const ffmpegMock = ffmpeg as unknown as { mockReturnValue: Function }
-      ffmpegMock.mockReturnValue({
-        screenshots: screenshotsMock,
-        on: onMock,
-      })
+      ffmpegMock.mockReturnValue(mockFfmpeg)
 
       await expect(
-        frameExtractor.extractFrames(
-          video,
-          interval,
-          outputFolder,
-          size,
-          start,
-          end,
-        ),
-      ).rejects.toThrow(error)
+        frameExtractor.extractFrames(video, 10, 'output', '320x240', 0, 30),
+      ).rejects.toThrow('ffmpeg error')
     })
   })
 })
