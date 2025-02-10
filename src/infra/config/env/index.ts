@@ -23,6 +23,9 @@ const envSchema = z.object({
   // AWS Services
   SQS_QUEUE_NAME: z.string().min(1),
   SQS_QUEUE_NAME_SUBSCRIPTION: z.string().min(1),
+
+  // JWT
+  JWT_SECRET: z.string().min(1),
 })
 
 const _env = envSchema.safeParse(process.env)
