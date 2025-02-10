@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: fiap-hackaton
+      POSTGRES_PASSWORD: our-strong-password-1205132
+      POSTGRES_DB: fiap-hackaton
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  grafana:
+    image: grafana/grafana:11.5.1
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+volumes:
+  postgres_data:
+  grafana-storage:
