@@ -1,6 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 
-import { ListVideosResponseDTO } from '@/core/application/video-processing/dtos/list-videos-dto'
 import { makeVideoListing } from '@/infra/adapter/factories/make-video-listing'
 
 export async function listVideosController(
@@ -11,7 +10,7 @@ export async function listVideosController(
     const listVideosUseCase = await makeVideoListing()
     const videos = await listVideosUseCase.execute()
 
-    const response: ListVideosResponseDTO = {
+    const response = {
       videos: videos.map((video) => ({
         filename: video.info.filename,
         status: video.status,

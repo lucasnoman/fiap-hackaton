@@ -41,7 +41,7 @@ export class FrameExtractorFfmpeg implements FrameExtractorPort {
         .setDuration(duration)
         .outputOptions(`-vf fps=1/${interval},scale=${size}`)
         .outputOptions('-qscale:v 2')
-        .output(`${outputFolder}/${uniqueName}__frame_at_%04d.jpg`)
+        .output(`${outputFolder}/${uniqueName('video')}__frame_at_%04d.jpg`)
         .on('end', () => resolve())
         .on('error', reject)
         .run()

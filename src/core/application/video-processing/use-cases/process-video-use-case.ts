@@ -42,7 +42,7 @@ export class ProcessVideoUseCase {
     const zipFilePath = path.resolve(
       process.cwd(),
       'output',
-      `${uniqueName}.zip`,
+      `${uniqueName('video')}.zip`,
     )
 
     DirectoryService.ensureDirectoryExists(outputFolder)

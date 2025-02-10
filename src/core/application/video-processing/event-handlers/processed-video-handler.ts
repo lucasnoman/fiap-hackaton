@@ -11,6 +11,7 @@ export class ProcessedVideoEventHandler {
     }
 
     video.setStatus(event.status)
-    await this.videoRepository.save(video)
+    await this.videoRepository.update(video)
+    console.log(`Video ${event.filename} processed with status ${event.status}`)
   }
 }

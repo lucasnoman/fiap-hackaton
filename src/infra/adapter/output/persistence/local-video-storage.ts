@@ -13,7 +13,7 @@ import { uniqueName } from '@/shared/utils/unique-name-creator'
 export class LocalVideoStorageAdapter implements VideoStoragePort {
   async save(video: VideoRest): Promise<VideoMetadata> {
     const fileExtension = path.extname(video.filename)
-    const uniqueFilename = `${uniqueName}${fileExtension}`
+    const uniqueFilename = `${uniqueName('video')}${fileExtension}`
 
     const outputFolder = path.resolve(
       process.cwd(),

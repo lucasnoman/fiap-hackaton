@@ -16,7 +16,11 @@ describe('ProcessVideoUseCase', () => {
   let processVideoUseCase: ProcessVideoUseCase
 
   const OUTPUTFOLDER = path.resolve(process.cwd(), 'output', 'frames')
-  const ZIPFILEPATH = path.resolve(process.cwd(), 'output', `${uniqueName}.zip`)
+  const ZIPFILEPATH = path.resolve(
+    process.cwd(),
+    'output',
+    `${uniqueName('video')}.zip`,
+  )
   const VIDEOFILENAME = 'test-video.mp4'
   const VIDEOPATH = path.resolve(
     process.cwd(),
