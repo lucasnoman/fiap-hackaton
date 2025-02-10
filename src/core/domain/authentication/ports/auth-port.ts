@@ -1,11 +1,17 @@
-import { User } from '../entities/user';
+import { UserDTO } from '../../../application/authentication/dtos/user-dto';
 
-export class AuthenticationRepository {
-  async createUser(username: string, passwordHash: string): Promise<User> {
-    throw new Error("Method not implemented.");
-  }
+export interface AuthenticationRepository {
 
-  async getUserByUsername(username: string): Promise<User | null> {
-    throw new Error("Method not implemented.");
-  }
+  
+  createUser(username: string, passwordHash: string): Promise<UserDTO>;
+
+  getUserByUsername(username: string): Promise<UserDTO | null>;
+  
+  getUserById(id: string): Promise<UserDTO | null>;
+
+  getPasswordHashByUsername(username: string): Promise<string | null>;
+
+  validatePassword(userId: string, password: string): Promise<boolean>;
+
+  updatePassword(userId: string, newPasswordHash: string): Promise<void>;
 }

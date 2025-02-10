@@ -4,15 +4,15 @@ import { ProcessVideoUseCase } from './core/application/video-processing/use-cas
 import { getVideoInput } from './infra/adapter/input/video-input'
 import { FrameExtractorFfmpeg } from './infra/adapter/output/frame-extractor-ffmpeg'
 import { ZipCreatorArchiver } from './infra/adapter/output/zip-creator-archiver'
-
+import { UserRepository } from './infra/adapter/output/auth-repository';
 import { AuthUseCase  } from './core/application/authentication/use-cases/auth-use-case'
 
 ;(async () => {
   console.log('Process started...')
 
   try {
-
-    const authUseCase = new AuthUseCase()
+    const userRepository = new UserRepository();
+    const authUseCase = new AuthUseCase(userRepository);
     const username = 'exampleUser';
     const password = 'examplePassword';
     const token = await authUseCase.authenticateUser(username, password)
