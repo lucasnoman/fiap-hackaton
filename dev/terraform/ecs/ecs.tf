@@ -16,7 +16,7 @@ resource "aws_ecs_task_definition" "api_task" {
     {
       name    = "api"
       image   = var.api_image_uri
-      command = ["sh", "-c", "npm install && npx prisma generate && npx prisma migrate deploy && node build/server.js"]
+      command = ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node build/server.js"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -69,6 +69,10 @@ resource "aws_ecs_task_definition" "api_task" {
         {
           name  = "RESEND_API_KEY",
           value = "${var.resend_api_key}"
+        },
+        {
+          name  = "JWT_SECRET",
+          value = "${var.jwt_secret}"
         }
       ],
       essential = true

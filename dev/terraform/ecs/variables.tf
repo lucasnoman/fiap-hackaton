@@ -92,3 +92,8 @@ variable "resend_api_key" {
   type        = string
   description = "API key for the resend API."
 }
+
+variable "jwt_secret" {
+  type        = string
+  description = "Secret for JWT token generation."
+}
