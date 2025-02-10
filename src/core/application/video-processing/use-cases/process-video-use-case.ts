@@ -5,6 +5,7 @@ import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-e
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { ZipCreatorPort } from '@/core/domain/video-processing/ports/zip-creator-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 import { uniqueName } from '@/shared/utils/unique-name-creator'
 
 import { DirectoryService } from '../services/directory-service'
@@ -41,7 +42,7 @@ export class ProcessVideoUseCase {
     const zipFilePath = path.resolve(
       process.cwd(),
       'output',
-      `${uniqueName}.zip`,
+      `${uniqueName('video')}.zip`,
     )
 
     DirectoryService.ensureDirectoryExists(outputFolder)
@@ -52,7 +53,7 @@ export class ProcessVideoUseCase {
       filename,
       videoDuration,
     )
-    const video = new Video(videoInfo)
+    const video = new Video(videoInfo, VideoStatus.PROCESSING)
 
     await this.videoRepository.save(video)
 

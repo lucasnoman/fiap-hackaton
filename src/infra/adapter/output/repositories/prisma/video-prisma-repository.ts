@@ -5,6 +5,7 @@ import { PrismaClient, Video as PrismaVideo } from '@prisma/client'
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 
 type PrismaVideoData = Omit<PrismaVideo, 'id' | 'createdAt' | 'updatedAt'>
 
@@ -24,13 +25,14 @@ export class VideoPrismaRepository implements VideoRepository {
       data.duration,
     )
 
-    return new Video(info)
+    return new Video(info, data.status as VideoStatus)
   }
 
   mapToRepository(video: Video): PrismaVideoData {
     return {
       duration: video.info.duration,
       filename: video.info.filename,
+      status: video.status,
     }
   }
 

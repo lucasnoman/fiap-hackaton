@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/poc-infrastructure
     paths:
       - '.github/workflows/deploy-api.yml'
       - tsconfig.json

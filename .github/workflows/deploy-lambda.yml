@@ -1,12 +1,9 @@
-name: Deploy to ECR
+name: Deploy Lambda to ECR
 
 on:
   push:
     branches:
       - main
-      - feature/sqs/localstack
-      - feature/event-bus
-      - feature/poc-infrastructure
     paths:
       - '.github/workflows/deploy-lambda.yml'
       - tsconfig.lambda.json

@@ -1,7 +1,8 @@
 import { fastifyCors } from '@fastify/cors'
+import fastifyJwt from '@fastify/jwt'
 import { fastifyMultipart } from '@fastify/multipart'
 import { fastifySwagger } from '@fastify/swagger'
-import fastify from 'fastify'
+import fastify, { FastifyReply, FastifyRequest } from 'fastify'
 import metricsPlugin from 'fastify-metrics'
 import {
   jsonSchemaTransform,
@@ -23,12 +24,27 @@ app.register(fastifyMultipart, { limits: { fileSize: 300 * 1024 * 1024 } })
 
 app.register(fastifyCors, { origin: '*' })
 
+// Register JWT plugin
+app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+})
+
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: 'Typed API',
+      title: 'Extract Frames API',
       version: '0.1.0',
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
   },
   transform: jsonSchemaTransform,
 })
@@ -39,6 +55,19 @@ app.register(import('@scalar/fastify-api-reference'), {
 })
 
 app.register(metricsPlugin, { endpoint: '/metrics' })
+
+// Add JWT authentication decorator
+app.decorate(
+  'authenticate',
+  async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await request.jwtVerify()
+    } catch (error) {
+      reply.send(error)
+    }
+  },
+)
+
 app.register(setupRoutes)
 
 app.setErrorHandler((error, _request, reply) => {

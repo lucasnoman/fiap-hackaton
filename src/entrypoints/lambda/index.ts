@@ -8,7 +8,9 @@ import ffmpeg from 'fluent-ffmpeg'
 import { Message } from '@/core/application/queue/value-objects/message-value-object'
 import { ExtractFramesUseCase } from '@/core/application/video-processing/use-cases/extract-frames-use-case'
 import { ExtractFramesEventPayload } from '@/core/application/video-processing/use-cases/process-video-on-queue-use-case'
+import { ProcessedVideoEvent } from '@/core/domain/video-processing/events/processed-video-event'
 import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 import { FrameExtractorFfmpeg } from '@/infra/adapter/output/external-services/frame-extractor-ffmpeg'
 import { S3Adapter } from '@/infra/adapter/output/s3-adapter'
 
@@ -37,7 +39,6 @@ export const handler: SQSHandler = async (event) => {
       const videoPath = payload.storagePath
       const outputFolder = path.resolve(
         '/tmp',
-        'output',
         'frames',
         payload.filename.split('.')[0],
       )
@@ -64,6 +65,11 @@ export const handler: SQSHandler = async (event) => {
         startTime,
         endTime,
       )
+
+      const payloadResponse: ProcessedVideoEvent = {
+        filename: payload.filename,
+        status: VideoStatus.PROCESSED,
+      }
 
       // console.log(`Processing video s3://${inputBucket}/${inputKey}`)
 
@@ -110,12 +116,7 @@ export const handler: SQSHandler = async (event) => {
           MessageBody: JSON.stringify({
             event: VideoProcessingEvents.PROCESSED_VIDEO,
             timestamp: Date.now(),
-            payload: {
-              status: 'COMPLETED',
-              // framesCount: frameFiles.length,
-              // inputVideo: `s3://${inputBucket}/${inputKey}`,
-              // outputFramesPrefix: `s3://${outputBucket}/${outputPrefix}/`,
-            },
+            payload: payloadResponse,
           } as Message),
         }),
       )

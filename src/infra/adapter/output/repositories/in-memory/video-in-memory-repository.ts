@@ -3,11 +3,13 @@ import path from 'node:path'
 import { Video } from '@/core/domain/video-processing/entities/video'
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 
 type InMemoryVideo = {
   id: number
   filename: string
   duration: number
+  status: VideoStatus
 }
 
 export class VideoInMemoryRepository implements VideoRepository {
@@ -26,7 +28,7 @@ export class VideoInMemoryRepository implements VideoRepository {
       data.filename,
       data.duration,
     )
-    return new Video(videoInfo)
+    return new Video(videoInfo, data.status)
   }
 
   mapToRepository(video: Video): InMemoryVideo {
@@ -34,6 +36,7 @@ export class VideoInMemoryRepository implements VideoRepository {
       id: this.currentId,
       filename: video.info.filename,
       duration: video.info.duration,
+      status: video.status,
     }
   }
 
@@ -42,6 +45,7 @@ export class VideoInMemoryRepository implements VideoRepository {
       id: this.currentId++,
       filename: video.info.filename,
       duration: video.info.duration,
+      status: video.status,
     })
   }
 

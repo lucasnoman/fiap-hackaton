@@ -31,7 +31,7 @@ import { VideoPrismaRepository } from './infra/adapter/output/repositories/prism
       secondsEndExtractingFrames: endTime,
     })
 
-    console.log('Process completed successfully.')
+    console.log('Process completed successfully')
   } catch (error) {
     console.error('An error occurred during the process:', error)
   }

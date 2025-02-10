@@ -1,2 +1,2 @@
-// TODO: Improve the unique name creator
-export const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}-${crypto.randomUUID()}`
+import { v4 as uuid } from 'uuid'
+export const uniqueName = (prefix: string): string => `${prefix}-${uuid()}`

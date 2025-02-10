@@ -81,3 +81,9 @@ variable "postgres_password" {
   default     = "our-strong-password-1205132"
   description = "The PostgreSQL user's password."
 }
+
+variable "jwt_secret" {
+  type        = string
+  default     = "our-strong-jwt-secret-1205132"
+  description = "The secret to use for JWT tokens."
+}

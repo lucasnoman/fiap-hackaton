@@ -6,6 +6,7 @@ import { FrameExtractorPort } from '@/core/domain/video-processing/ports/frame-e
 import { VideoRepository } from '@/core/domain/video-processing/ports/repository-port'
 import { VideoProcessingEvents } from '@/core/domain/video-processing/value-objects/events-enum'
 import { VideoInformation } from '@/core/domain/video-processing/value-objects/video-information'
+import { VideoStatus } from '@/core/domain/video-processing/value-objects/video-status'
 
 import { MessageQueuePort } from '../../queue/ports/message-queue-port'
 import { StoragePort } from '../../storage/ports/storage-port'
@@ -57,7 +58,7 @@ export class ProcessVideoOnQueueUseCase {
       filename,
       videoDuration,
     )
-    const video = new Video(videoInfo)
+    const video = new Video(videoInfo, VideoStatus.PROCESSING)
 
     const storageFolder = 'videos'
     const storageVideoPath = `${storageFolder}/${filename}`

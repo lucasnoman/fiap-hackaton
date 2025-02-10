@@ -76,3 +76,24 @@ variable "sqs_frame_extractor_url" {
   type        = string
   description = "URL for the SQS queue to use for the frame extractor."
 }
+
+
+variable "s3_frame_extractor_url" {
+  type        = string
+  description = "URL for the S3 bucket to use for the frame extractor."
+}
+
+variable "sqs_frame_extractor_url_subscription" {
+  type        = string
+  description = "URL for the SQS queue to use for the frame extractor completion."
+}
+
+variable "resend_api_key" {
+  type        = string
+  description = "API key for the resend API."
+}
+
+variable "jwt_secret" {
+  type        = string
+  description = "Secret for JWT token generation."
+}

@@ -15,8 +15,9 @@ datasource db {
 
 model Video {
   id        Int      @id @default(autoincrement())
-  filename  String
+  filename  String   @unique
   duration  Int
+  status    String   @default("processing")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   frames    Frame[]
@@ -28,10 +29,19 @@ model Frame {
   id        Int      @id @default(autoincrement())
   videoId   Int
   timestamp String
-  filename  String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   video     Video    @relation(fields: [videoId], references: [id])
 
   @@map(name: "frames")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "users")
 }

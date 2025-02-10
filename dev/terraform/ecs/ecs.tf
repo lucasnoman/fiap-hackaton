@@ -16,7 +16,7 @@ resource "aws_ecs_task_definition" "api_task" {
     {
       name    = "api"
       image   = var.api_image_uri
-      command = ["sh", "-c", "npm install && npx prisma generate && npx prisma migrate deploy && node build/server.js"]
+      command = ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node build/server.js"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -49,13 +49,30 @@ resource "aws_ecs_task_definition" "api_task" {
           name  = "AWS_REGION"
           value = "${var.aws_region}"
         },
+
+        {
+          name  = "AWS_PROFILE",
+          value = "default"
+        },
         {
           name  = "SQS_QUEUE_NAME",
           value = "${var.sqs_frame_extractor_url}"
         },
         {
-          name  = "AWS_PROFILE",
-          value = "default"
+          name  = "S3_BUCKET_NAME",
+          value = "${var.s3_frame_extractor_url}"
+        },
+        {
+          name  = "SQS_QUEUE_NAME_SUBSCRIPTION",
+          value = "${var.sqs_frame_extractor_url_subscription}"
+        },
+        {
+          name  = "RESEND_API_KEY",
+          value = "${var.resend_api_key}"
+        },
+        {
+          name  = "JWT_SECRET",
+          value = "${var.jwt_secret}"
         }
       ],
       essential = true
