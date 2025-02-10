@@ -27,7 +27,6 @@ Este projeto foi desenvolvido como trabalho final do curso de Pós-Graduação e
   - [Testes](#testes)
   - [Considerações Finais](#considerações-finais)
   - [Contribuição](#contribuição)
-  - [Licença](#licença)
 
 ---
 
@@ -262,10 +261,6 @@ Este projeto demonstra a aplicação de conceitos avançados de arquitetura de s
 ## Contribuição
 
 Este projeto foi desenvolvido como trabalho final de um curso de pós-graduação e serve como demonstração de boas práticas e conceitos avançados em arquitetura de software. Professores e avaliadores poderão apreciar a clareza na separação das camadas, a robustez dos testes, a automação do deploy e o monitoramento integrado. Sugestões e melhorias são bem-vindas para aprimorar ainda mais a solução.
-
----
-
-## Licença
 
 ---
 
