@@ -32,7 +32,7 @@ app.register(fastifyJwt, {
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: 'Typed API',
+      title: 'Extract Frames API',
       version: '0.1.0',
     },
     components: {
