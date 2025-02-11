@@ -41,6 +41,7 @@ O sistema foi desenvolvido para atender à demanda da empresa FIAP X, que deseja
 
 ---
 
+
 ## Arquitetura do Sistema
 
 A solução adota uma abordagem **hexagonal** e **orientada a microsserviços**, dividindo o sistema em camadas e componentes independentes. Veja abaixo um resumo da arquitetura:
@@ -141,6 +142,26 @@ Renomeie o arquivo `.env.example` para `.env` e configure as seguintes variávei
 - `JWT_SECRET` – Chave secreta para geração de tokens JWT
 
 ---
+
+## Política de Uso de Dados
+
+### Coleta de Dados:
+O sistema coleta dados pessoais como informações de autenticação e dados relacionados ao vídeo enviado (nome do arquivo, informações sobre a extração dos frames). Esses dados são necessários para processar os vídeos e gerar as imagens.
+
+### Uso dos Dados:
+Os dados são utilizados para processar o conteúdo enviado, autenticar usuários e fornecer notificações relacionadas ao processo. Não utilizamos os dados para finalidades fora do escopo do serviço oferecido.
+
+### Armazenamento de Dados:
+Os vídeos e imagens geradas são armazenados de forma segura em infraestrutura AWS, com criptografia tanto em repouso quanto em trânsito. A plataforma garante que o acesso aos dados seja restrito aos processos necessários para o funcionamento do sistema.
+
+### Consentimento do Usuário:
+O usuário deve consentir com os termos de uso e a política de privacidade antes de enviar qualquer conteúdo para processamento.
+
+### Compartilhamento de Dados:
+Os dados pessoais não serão compartilhados com terceiros sem o devido consentimento do usuário, exceto em situações legais ou para cumprir com obrigações contratuais.
+
+---
+
 
 ## Como Executar
 
