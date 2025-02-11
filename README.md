@@ -74,8 +74,11 @@ A solução adota uma abordagem **hexagonal** e **orientada a microsserviços**,
 - **Prometheus:** Coleta métricas dos serviços.
 - **Grafana:** Visualiza as métricas e fornece dashboards para monitoramento em tempo real.
 
-> **Diagrama da Arquitetura:**  
-> Um diagrama completo está disponível no arquivo de diagrama (utilizando Eraser.io) e demonstra como cada componente se integra na solução.
+> **Diagramas da Arquitetura:**
+>
+> **Arquitetura DDD e Componentes:** > ![DDD Frame Extractor](./docs/DDD%20Frame%20extractor.png)
+>
+> **Infraestrutura AWS:** > ![Arquitetura AWS](./docs/Arquitetura%20infra.png)
 
 ---
 
